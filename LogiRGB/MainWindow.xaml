@@ -4,9 +4,26 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LogiRGB"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        mc:Ignorable="d" Loaded="Window_Loaded"
+        Title="LogiRGB" Height="400" Width="240">
     <Grid>
-        
-    </Grid>
+		
+		<StackPanel>
+			<Button x:Name="button" Click="button_Click" Content="Exit"/>
+			<Button x:Name="buttonF" Click="button_Flash" Content="Flash"/>
+			<Button x:Name="buttonP" Click="button_Pulse" Content="Pulse"/>
+			<Button x:Name="buttonS" Click="button_SetColor" Content="SetColor"/>
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition />
+					<ColumnDefinition />
+					<ColumnDefinition />
+				</Grid.ColumnDefinitions>
+				<TextBox x:Name="tbR" Text="255" />
+				<TextBox x:Name="tbG" Grid.Column="1" Text="127" />
+				<TextBox x:Name="tbB" Grid.Column="2" Text="0" />
+			</Grid>
+		</StackPanel>
+
+	</Grid>
 </Window>
