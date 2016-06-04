@@ -42,6 +42,9 @@ namespace LogiRGB {
 			Debug.WriteLine("Getting icon.");
 
 			Bitmap iconBitmap = Helpers.GetEXEIconBitmap(e.Filename);
+			if (iconBitmap.Size.Width > 100)
+				iconBitmap = iconBitmap.Resize(new System.Drawing.Size(100, 100));
+
 			//iconBitmap = iconBitmap.Resize(new System.Drawing.Size(128, 128));
 
 			var analyzedData = Helpers.AnalyzeImage(iconBitmap, 32);
