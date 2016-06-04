@@ -15,6 +15,9 @@ namespace LogiRGB {
 		[DllImport("user32.dll")]
 		public static extern IntPtr SetWinEventHook(uint eventMin, uint eventMax, IntPtr hmodWinEventProc, WinEventDelegate lpfnWinEventProc, uint idProcess, uint idThread, uint dwFlags);
 
+		[DllImport("user32.dll")]
+		public static extern bool UnhookWinEvent(IntPtr hWinEventHook);
+
 		public const uint WINEVENT_OUTOFCONTEXT = 0;
 		public const uint EVENT_SYSTEM_FOREGROUND = 3;
 
