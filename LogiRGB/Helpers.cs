@@ -92,7 +92,7 @@ namespace LogiRGB {
 								colorDict[bgra]++;
 							} else {
 								colorDict[bgra] = 0;
-								Debug.WriteLine(Color.FromArgb(bgra));
+								//Debug.WriteLine(Color.FromArgb(bgra));
 							}
 						}
 					}

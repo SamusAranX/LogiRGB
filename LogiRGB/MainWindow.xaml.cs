@@ -42,8 +42,10 @@ namespace LogiRGB {
 			Debug.WriteLine("Getting icon.");
 
 			Bitmap iconBitmap = Helpers.GetEXEIconBitmap(e.Filename);
-			if (iconBitmap.Size.Width > 100)
-				iconBitmap = iconBitmap.Resize(new System.Drawing.Size(100, 100));
+			if (iconBitmap.Size.Width > 128) {
+				iconBitmap = iconBitmap.Resize(new System.Drawing.Size(128, 128));
+				Debug.WriteLine("Icon is bigger than 128x128, resizing.");
+			}
 
 			//iconBitmap = iconBitmap.Resize(new System.Drawing.Size(128, 128));
 
@@ -55,17 +57,13 @@ namespace LogiRGB {
 
 			Debug.WriteLine(string.Join(", ", colors.Select(c => c.ToString())));
 
-			color1.Background = new SolidColorBrush(Helpers.ToMediaColor(colors[0]));
-			color2.Background = new SolidColorBrush(Helpers.ToMediaColor(colors[1]));
-			color3.Background = new SolidColorBrush(Helpers.ToMediaColor(colors[2]));
-			color4.Background = new SolidColorBrush(Helpers.ToMediaColor(colors[3]));
-		}
-
-		private void button_Pulse(object sender, RoutedEventArgs e) {
-			LogitechGSDK.LogiLedPulseLighting(int.Parse(tbR.Text), int.Parse(tbG.Text), int.Parse(tbB.Text), 1000, 1000);
-		}
-		private void button_SetColor(object sender, RoutedEventArgs e) {
-			LogitechGSDK.LogiLedSetLighting(int.Parse(tbR.Text), int.Parse(tbG.Text), int.Parse(tbB.Text));
+			Border[] colorBorders = { color1, color2, color3, color4 };
+			foreach (Border b in colorBorders) {
+				b.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0, 255, 255, 255));
+			}
+			for (int i = 0; i < colors.Length; i++) {
+				colorBorders[i].Background = new SolidColorBrush(Helpers.ToMediaColor(colors[i]));
+			}
 		}
 
 		private void Window_Loaded(object sender, RoutedEventArgs e) {

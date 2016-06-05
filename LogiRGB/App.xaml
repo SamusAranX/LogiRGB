@@ -7,8 +7,14 @@
 			 Startup="Application_Startup" Exit="Application_Exit">
 
 	<Application.Resources>
-		<tb:TaskbarIcon x:Key="taskbarIcon"
+		<ResourceDictionary>
+			<tb:TaskbarIcon x:Key="taskbarIcon"
 						IconSource="LogiRGB.ico"
 						ToolTip="what" />
+
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="Styles/AdobeSlider.xaml" />
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
 	</Application.Resources>
 </Application>
