@@ -12,9 +12,9 @@
 						IconSource="LogiRGB.ico"
 						ToolTip="what" />
 
-			<ResourceDictionary.MergedDictionaries>
+			<!--<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="Styles/AdobeSlider.xaml" />
-			</ResourceDictionary.MergedDictionaries>
+			</ResourceDictionary.MergedDictionaries>-->
 		</ResourceDictionary>
 	</Application.Resources>
 </Application>

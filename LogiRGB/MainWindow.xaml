@@ -17,6 +17,8 @@
 			<RowDefinition Height="20" />
 			<RowDefinition Height="20" />
 			<RowDefinition Height="20" />
+			<RowDefinition Height="20" />
+			<RowDefinition Height="20" />
 		</Grid.RowDefinitions>
 
 		<Grid Grid.Row="0">
@@ -51,7 +53,10 @@
 		</Grid>
 
 		<Slider x:Name="SliderHue" Grid.Row="2" Value="2" />
-		<Slider x:Name="SliderSat" Grid.Row="3" Value="8" Template="{DynamicResource SliderHorizontal}" />
+		<Slider x:Name="SliderSat" Grid.Row="3" Value="8" />
 		<Slider x:Name="SliderLum" Grid.Row="4" Value="5" />
+
+		<Button Content="Save Settings" Grid.Row="5" Click="SaveTest_Click" />
+		<Button Content="Load Settings" Grid.Row="6" Click="LoadTest_Click" />
 	</Grid>
 </Window>

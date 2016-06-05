@@ -84,5 +84,33 @@ namespace LogiRGB {
 			//}
 			//LogitechGSDK.LogiLedSetTargetDevice(LogitechGSDK.LOGI_DEVICETYPE_ALL);
 		}
+
+		private void SaveTest_Click(object sender, RoutedEventArgs e) {
+			Settings settings = new Settings();
+			settings.FallbackColor = new byte[]{ 255, 127, 0 };
+			settings.HashesAndColors = new Dictionary<string, byte[]>();
+
+			try {
+				var r = new Random();
+				var loopMax = r.Next(128, 512);
+				for (int i = 0; i < loopMax; i++) {
+					byte[] testColors = new byte[3];
+					r.NextBytes(testColors);
+
+					settings.HashesAndColors.Add("key" + i.ToString(), testColors);
+				}
+			} catch (Exception ex) {
+				Debug.WriteLine(ex.Message);
+			}
+
+			Debug.WriteLine("SaveSettings: " + settings.SaveSettings().ToString());
+		}
+
+		private void LoadTest_Click(object sender, RoutedEventArgs e) {
+			var settings = Settings.LoadSettings();
+
+			Debug.WriteLine(string.Join(", ", settings.FallbackColor));
+			Debug.WriteLine(string.Join(", ", settings.HashesAndColors));
+		}
 	}
 }

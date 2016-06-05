@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Diagnostics;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
@@ -33,9 +34,10 @@ namespace LogiRGB {
 		}
 
 		private void FocusWatcher_FocusChanged(object sender, FocusChangedEventArgs e) {
+			var bitmapBytes = e.IconBitmap.ToByteArray(ImageFormat.Png);
 
 			using (SHA1CryptoServiceProvider sha1 = new SHA1CryptoServiceProvider()) {
-				Convert.ToBase64String(sha1.ComputeHash(byteArray));
+				var hashString = Convert.ToBase64String(sha1.ComputeHash(bitmapBytes));
 			}
 		}
 
