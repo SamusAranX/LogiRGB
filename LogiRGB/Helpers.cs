@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
@@ -47,6 +48,13 @@ namespace LogiRGB {
 
 		public static System.Windows.Media.Color ToMediaColor(this Color color) {
 			return System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B);
+		}
+
+		public static byte[] ToByteArray(this Image image, ImageFormat format) {
+			using (MemoryStream ms = new MemoryStream()) {
+				image.Save(ms, format);
+				return ms.ToArray();
+			}
 		}
 
 		public static Bitmap Resize(this Bitmap bitmap, System.Drawing.Size size) {

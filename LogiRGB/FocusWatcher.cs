@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,19 +33,20 @@ namespace LogiRGB {
 
 			try {
 				string filename = Process.GetProcessById((int)processID).MainModule.FileName;
-				OnFocusChanged((int)processID, windowHandle, filename);
+				Bitmap iconBitmap = Helpers.GetEXEIconBitmap(filename);
+
+				OnFocusChanged((int)processID, windowHandle, filename, iconBitmap);
 			} catch (Exception ex) {
 				Debug.WriteLine(ex.Message);
 			}
-			
 		}
 
-		protected virtual void OnFocusChanged(int processID, IntPtr windowHandle, string filename) {
+		protected virtual void OnFocusChanged(int processID, IntPtr windowHandle, string filename, Bitmap iconBitmap) {
 			var handler = FocusChanged;
 			if (handler == null)
 				return;
 
-			var eventArgs = new FocusChangedEventArgs(processID, windowHandle, filename);
+			var eventArgs = new FocusChangedEventArgs(processID, windowHandle, filename, iconBitmap);
 			handler(this, eventArgs);
 		}
 
@@ -55,11 +57,13 @@ namespace LogiRGB {
 		private readonly int _processID;
 		private readonly IntPtr _windowHandle;
 		private readonly string _filename;
+		private readonly Bitmap _iconBitmap;
 
-		public FocusChangedEventArgs(int processID, IntPtr windowHandle, string filename) {
+		public FocusChangedEventArgs(int processID, IntPtr windowHandle, string filename, Bitmap iconBitmap) {
 			_processID = processID;
 			_windowHandle = windowHandle;
 			_filename = filename;
+			_iconBitmap = iconBitmap;
 		}
 
 		public int ProcessID {
@@ -77,6 +81,12 @@ namespace LogiRGB {
 		public string Filename {
 			get {
 				return _filename;
+			}
+		}
+
+		public Bitmap IconBitmap {
+			get {
+				return _iconBitmap;
 			}
 		}
 	}

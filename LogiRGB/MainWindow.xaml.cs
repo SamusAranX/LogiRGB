@@ -41,7 +41,7 @@ namespace LogiRGB {
 		private void FocusWatcher_FocusChanged(object sender, FocusChangedEventArgs e) {
 			Debug.WriteLine("Getting icon.");
 
-			Bitmap iconBitmap = Helpers.GetEXEIconBitmap(e.Filename);
+			Bitmap iconBitmap = e.IconBitmap;
 			if (iconBitmap.Size.Width > 128) {
 				iconBitmap = iconBitmap.Resize(new System.Drawing.Size(128, 128));
 				Debug.WriteLine("Icon is bigger than 128x128, resizing.");

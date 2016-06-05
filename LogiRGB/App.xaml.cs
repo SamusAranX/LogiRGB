@@ -5,6 +5,7 @@ using System.Configuration;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Windows;
 using Hardcodet.Wpf.TaskbarNotification;
@@ -17,6 +18,7 @@ namespace LogiRGB {
 
 		public FocusWatcher focusWatcher;
 		private TaskbarIcon taskbarIcon;
+		public Settings settings;
 
 		private void Application_Startup(object sender, StartupEventArgs e) {
 			taskbarIcon = (TaskbarIcon)FindResource("taskbarIcon");
@@ -31,8 +33,10 @@ namespace LogiRGB {
 		}
 
 		private void FocusWatcher_FocusChanged(object sender, FocusChangedEventArgs e) {
-			Debug.WriteLine(e.Filename);
-			
+
+			using (SHA1CryptoServiceProvider sha1 = new SHA1CryptoServiceProvider()) {
+				Convert.ToBase64String(sha1.ComputeHash(byteArray));
+			}
 		}
 
 		private void Application_Exit(object sender, ExitEventArgs e) {

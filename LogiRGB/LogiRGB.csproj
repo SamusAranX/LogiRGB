@@ -100,6 +100,7 @@
     <Compile Include="IconExtractor\IconUtil.cs" />
     <Compile Include="IconExtractor\NativeMethods.cs" />
     <Compile Include="LogitechGSDK.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="StyleTestWindow.xaml.cs">
       <DependentUpon>StyleTestWindow.xaml</DependentUpon>
     </Compile>
