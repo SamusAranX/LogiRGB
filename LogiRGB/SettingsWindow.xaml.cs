@@ -19,12 +19,14 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using TsudaKageyu;
 
+using MColor = System.Windows.Media.Color;
+
 namespace LogiRGB {
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
-	public partial class MainWindow : Window {
-		public MainWindow() {
+	public partial class SettingsWindow : Window {
+		public SettingsWindow() {
 			InitializeComponent();
 		}
 
@@ -38,57 +40,40 @@ namespace LogiRGB {
 			Application.Current.Shutdown();
 		}
 
-		private void FocusWatcher_FocusChanged(object sender, FocusChangedEventArgs e) {
-			Debug.WriteLine("Getting icon.");
+		//
+		// Window and Event Management
+		//
 
-			Bitmap iconBitmap = e.IconBitmap;
-			if (iconBitmap.Size.Width > 128) {
-				iconBitmap = iconBitmap.Resize(new System.Drawing.Size(128, 128));
-				Debug.WriteLine("Icon is bigger than 128x128, resizing.");
-			}
+		private void Window_Loaded(object sender, RoutedEventArgs e) {
+			((App)Application.Current).colorManager.ColorChanged += ColorManager_ColorChanged;
+		}
 
-			//iconBitmap = iconBitmap.Resize(new System.Drawing.Size(128, 128));
+		private void ColorManager_ColorChanged(object sender, ColorChangedEventArgs e) {
+			var colors = e.AllColors;
 
-			var analyzedData = Helpers.AnalyzeImage(iconBitmap, 32);
-			var quantBitmap = analyzedData.Item1;
-			var colors = analyzedData.Item2;
-
-			image.Source = quantBitmap.ToBitmapSource();
-
-			Debug.WriteLine(string.Join(", ", colors.Select(c => c.ToString())));
+			Debug.WriteLine("All colors: " + string.Join(", ", colors.Select(c => c.ToString())));
 
 			Border[] colorBorders = { color1, color2, color3, color4 };
 			foreach (Border b in colorBorders) {
-				b.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0, 255, 255, 255));
+				b.Background = new SolidColorBrush(MColor.FromArgb(200, 255, 255, 255));
 			}
 			for (int i = 0; i < colors.Length; i++) {
 				colorBorders[i].Background = new SolidColorBrush(Helpers.ToMediaColor(colors[i]));
 			}
 		}
 
-		private void Window_Loaded(object sender, RoutedEventArgs e) {
-			//if (!IsAdministrator()) {
-			//	MessageBox.Show("Without administrator privileges, LogiRGB won't be able to read some applications' data.\nYou don't have to grant it these privileges, but without them, some applications will not trigger a color change.", "LogiRGB", MessageBoxButton.OK, MessageBoxImage.Information);
-			//}
-
-			((App)Application.Current).focusWatcher.FocusChanged += FocusWatcher_FocusChanged;
-
-			//if (!LogitechGSDK.LogiLedInit()) {
-			//	Debug.WriteLine("LogiLedInit failed");
-			//}
-			//Thread.Sleep(3000);
-			//LogitechGSDK.LogiLedSetTargetDevice(LogitechGSDK.LOGI_DEVICETYPE_RGB);
-
-			//if (!LogitechGSDK.LogiLedInit()) {
-			//	MessageBox.Show("Couldn't initialize SDK.", "LogiRGB", MessageBoxButton.OK, MessageBoxImage.Information);
-			//}
-			//LogitechGSDK.LogiLedSetTargetDevice(LogitechGSDK.LOGI_DEVICETYPE_ALL);
+		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
+			((App)Application.Current).colorManager.ColorChanged -= ColorManager_ColorChanged;
 		}
+
+
+
+		//
+		// SUPER SECRIT DEBUGGING STUFF
+		//
 
 		private void SaveTest_Click(object sender, RoutedEventArgs e) {
 			Settings settings = new Settings();
-			settings.FallbackColor = new byte[]{ 255, 127, 0 };
-			settings.HashesAndColors = new Dictionary<string, byte[]>();
 
 			try {
 				var r = new Random();
@@ -111,6 +96,18 @@ namespace LogiRGB {
 
 			Debug.WriteLine(string.Join(", ", settings.FallbackColor));
 			Debug.WriteLine(string.Join(", ", settings.HashesAndColors));
+		}
+
+		private void SetColorTest_Click(object sender, RoutedEventArgs e) {
+			var colR = (int)SliderR.Value;
+			var colG = (int)SliderG.Value;
+			var colB = (int)SliderB.Value;
+
+			LogitechGSDK.LogiLedSetLighting(colR, colG, colB);
+		}
+
+		private void PulseColorTest_Click(object sender, RoutedEventArgs e) {
+			
 		}
 	}
 }

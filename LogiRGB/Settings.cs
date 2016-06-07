@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,15 +16,28 @@ namespace LogiRGB {
 		public Dictionary<string, byte[]> HashesAndColors;
 		public byte[] FallbackColor;
 
-		public static Settings LoadSettings() {
-			var serializer = new JavaScriptSerializer();
-			var json = "";
+		/// <summary>
+		/// Instantiate a new Settings object. This will also instantiate all properties for convenience.
+		/// </summary>
+		public Settings() {
+			HashesAndColors = new Dictionary<string, byte[]>();
+			FallbackColor = new byte[] { 0, 127, 255 };
+		}
 
-			using (StreamReader inputFile = new StreamReader(_settingsPath)) {
-				json = inputFile.ReadToEnd();
+		public static Settings LoadSettings() {
+			if (!File.Exists(_settingsPath)) {
+				Debug.WriteLine("There are no saved settings yet. Returning a new object.");
+				
+				return new Settings();
 			}
 
-			return serializer.Deserialize<Settings>(json);
+			var serializer = new JavaScriptSerializer();
+
+			using (StreamReader inputFile = new StreamReader(_settingsPath)) {
+				var json = inputFile.ReadToEnd();
+				return serializer.Deserialize<Settings>(json);
+			}
+
 		}
 
 		public bool SaveSettings() {

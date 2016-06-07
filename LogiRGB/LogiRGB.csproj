@@ -38,7 +38,7 @@
   </PropertyGroup>
   <PropertyGroup />
   <PropertyGroup>
-    <ApplicationIcon>LogiRGB.ico</ApplicationIcon>
+    <ApplicationIcon>Images\LogiRGB.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup />
   <PropertyGroup>
@@ -64,6 +64,9 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>LogiRGB.App</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Hardcodet.Wpf.TaskbarNotification, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
@@ -95,6 +98,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ColorManager.cs" />
     <Compile Include="FocusWatcher.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="IconExtractor\IconExtractor.cs" />
@@ -106,7 +110,7 @@
       <DependentUpon>StyleTestWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="WinAPI.cs" />
-    <Page Include="MainWindow.xaml">
+    <Page Include="SettingsWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -114,8 +118,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
+    <Compile Include="SettingsWindow.xaml.cs">
+      <DependentUpon>SettingsWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Styles\AdobeSlider.xaml">
@@ -157,7 +161,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="LogiRGB.ico" />
+    <Resource Include="Images\LogiRGB.ico" />
     <Resource Include="Images\logirgb4.png" />
     <Resource Include="Images\logirgb_32.png" />
   </ItemGroup>

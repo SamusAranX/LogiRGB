@@ -3,13 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			 xmlns:tb="http://www.hardcodet.net/taskbar"
              xmlns:local="clr-namespace:LogiRGB"
-             StartupUri="MainWindow.xaml"
 			 Startup="Application_Startup" Exit="Application_Exit">
 
 	<Application.Resources>
 		<ResourceDictionary>
 			<tb:TaskbarIcon x:Key="taskbarIcon"
-						IconSource="LogiRGB.ico"
+						IconSource="Images/LogiRGB.ico"
 						ToolTip="what" />
 
 			<!--<ResourceDictionary.MergedDictionaries>
