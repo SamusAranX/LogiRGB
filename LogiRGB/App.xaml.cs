@@ -11,6 +11,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using Hardcodet.Wpf.TaskbarNotification;
 
 using DColor = System.Drawing.Color;
@@ -33,15 +34,13 @@ namespace LogiRGB {
 
 			settings = Settings.LoadSettings();
 
-			colorManager = new ColorManager(settings.FallbackColor.ToColor());
-			colorManager.ColorChanged += ColorManager_ColorChanged;
+			colorManager = new ColorManager(Helpers.ByteArrayToColor(settings.FallbackColor));
+			colorManager.InitializeSDK();
+			//colorManager.ColorChanged += ColorManager_ColorChanged;
 
 			focusWatcher = new FocusWatcher();
 			focusWatcher.FocusChanged += FocusWatcher_FocusChanged;
 			focusWatcher.StartWatching();
-
-			SettingsWindow settingsWindow = new SettingsWindow();
-			settingsWindow.Show();
 
 			//if(!IsAdministrator()) {
 			//	MessageBox.Show("Without administrator privileges, LogiRGB won't be able to read some applications' data.\nYou don't have to grant it these privileges, but without them, some applications will not trigger a color change.", "LogiRGB", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -50,55 +49,82 @@ namespace LogiRGB {
 
 		private void ColorManager_ColorChanged(object sender, ColorChangedEventArgs e) {
 			Debug.WriteLine("Color changed: " + e.NewColor.ToString());
+
+
 		}
 
 		private void FocusWatcher_FocusChanged(object sender, FocusChangedEventArgs e) {
+			Debug.WriteLine(e.Filename);
+
 			using (FileStream fs = File.OpenRead(e.Filename))
 			using (SHA1 sha1 = SHA1.Create()) {
 				var checksum = sha1.ComputeHash(fs);
 				var strChecksum = BitConverter.ToString(checksum).Replace("-", string.Empty).ToLowerInvariant();
 
 				if (settings.HashesAndColors.ContainsKey(strChecksum)) {
+					//
+					// Dictionary entry found, using data from that
+					//
 					var colorBytes = settings.HashesAndColors[strChecksum];
-					var colorNum = (int)Math.Floor(colorBytes.Length / 3.0); // The 3 is a float because Visual Studio is stupid
+					var color = Helpers.ByteArrayToColor(colorBytes);
 
-					DColor[] colors = new DColor[colorNum];
-					for (int i = 0; i < colorNum; i++) {
-						colors[i] = ((byte[])colorBytes.Skip(i * 3).Take(3)).ToColor();
-					}
+					Debug.WriteLine("Dictionary hit! " + color.ToString());
 
-					Debug.WriteLine("Dictionary hit! " + settings.HashesAndColors[strChecksum].ToColor().ToString());
-
-					colorManager.SetColor(settings.HashesAndColors[strChecksum].ToColor(), colors);
+					colorManager.SetColor(color);
 				} else {
+					//
+					// No dictionary entry found, generating color and creating entry
+					//
+
 					var iconBitmap = Helpers.GetEXEIconBitmap(e.Filename);
+
 					if (iconBitmap.Size.Width > 128) {
 						iconBitmap = iconBitmap.Resize(new DSize(128, 128));
 						Debug.WriteLine("Icon is bigger than 128x128, resizing.");
 					}
 
-					var colors = Helpers.AnalyzeImage(iconBitmap, 32);
-
-					byte[] colorBytes = new byte[] { };
-					foreach (var c in colors) {
-						colorBytes = colorBytes.Concat(new byte[] { c.R, c.G, c.B }).ToArray();
+					var colors = ColorManager.AnalyzeImage(iconBitmap, 32);
+					DColor newColor;
+					if (colors.Length == 0) {
+						newColor = Helpers.ByteArrayToColor(settings.FallbackColor);
+					} else {
+						newColor = colors[0].MoreIntenseColor();
 					}
-					settings.HashesAndColors[strChecksum] = colorBytes;
+					
+					settings.HashesAndColors[strChecksum] = newColor.ToByteArray();
+					colorManager.SetColor(newColor);
 
-					Debug.WriteLine($"New colors for {e.Filename}: " + string.Join(", ", colors.Select(c => c.ToString())));
-
-					colorManager.SetColor(colors[0], colors.Skip(1).ToArray());
+					settings.SaveSettings(); // Save settings so our newly generated colors aren't lost
 				}
 			}
 		}
 
-
-
 		private void Application_Exit(object sender, ExitEventArgs e) {
-			colorManager.ColorChanged -= ColorManager_ColorChanged;
+			colorManager.Shutdown();
 
 			focusWatcher.StopWatching();
 			focusWatcher.FocusChanged -= FocusWatcher_FocusChanged;
 		}
+	}
+
+	class ShowWindowCommand : ICommand {
+		public void Execute(object parameter) {
+			Debug.WriteLine("Double Click");
+
+			var openWindows = Application.Current.Windows.OfType<SettingsWindow>();
+			if (openWindows.Count() != 1) {
+				SettingsWindow settingsWindow = new SettingsWindow();
+				settingsWindow.Show();
+			} else {
+				var settingsWindow = openWindows.First();
+				settingsWindow.Focus();
+			}
+		}
+
+		public bool CanExecute(object parameter) {
+			return true;
+		}
+
+		public event EventHandler CanExecuteChanged;
 	}
 }

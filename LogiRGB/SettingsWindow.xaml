@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LogiRGB" UseLayoutRounding="True"
         mc:Ignorable="d" Loaded="Window_Loaded" Closing="Window_Closing" Topmost="True"
-        Title="LogiRGB Settings" Height="426" Width="240">
+        Title="LogiRGB Settings" Icon="Images/LogiRGB.ico" Height="426" Width="240">
 	<Window.Resources>
-		<DropShadowEffect x:Key="dropshadow" BlurRadius="0" Color="#000000" Opacity="0.5" Direction="270" RenderingBias="Quality" ShadowDepth="1" />
+		<DropShadowEffect x:Key="dropshadow" ShadowDepth="1" BlurRadius="4" Direction="270" RenderingBias="Quality"/>
 	</Window.Resources>
 	<Grid>
 		<Grid.RowDefinitions>
@@ -23,12 +23,15 @@
 			<RowDefinition Height="20" />
 		</Grid.RowDefinitions>
 
-		<UniformGrid Grid.Row="0" Height="128" Rows="2" Columns="2">
-			<Border Margin="4" Background="#FFB62222" Effect="{StaticResource dropshadow}" CornerRadius="4" Grid.Column="0" x:Name="color1"/>
-			<Border Margin="4" Effect="{StaticResource dropshadow}" CornerRadius="4" Grid.Column="1" x:Name="color2"/>
-			<Border Margin="4" Effect="{StaticResource dropshadow}" CornerRadius="4" Grid.Column="2" x:Name="color3"/>
-			<Border Margin="4" Effect="{StaticResource dropshadow}" CornerRadius="4" Grid.Column="3" x:Name="color4"/>
-		</UniformGrid>
+
+		<Border Grid.Row="0" Margin="4" CornerRadius="4" x:Name="colorBorder" />
+		<Border Grid.Row="0" Margin="32" CornerRadius="4" x:Name="colorBorderNew" />
+		<Label Grid.Row="0" Content="#FFFFFF" x:Name="colorLabel" Foreground="White" Effect="{StaticResource dropshadow}"
+				HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,4,0,0"
+				FontSize="16" FontFamily="Iosevka Slab Medium Oblique" />
+		<Label Grid.Row="0" Content="#FFFFFF" x:Name="colorLabelNew" Foreground="White" Effect="{StaticResource dropshadow}"
+				HorizontalAlignment="Center" VerticalAlignment="Center" 
+				FontSize="16" FontFamily="Iosevka Slab Medium Oblique" />
 
 		<Slider x:Name="SliderR" Grid.Row="2" Value="255" Maximum="255" />
 		<Slider x:Name="SliderG" Grid.Row="3" Value="127" Maximum="255" />
@@ -36,8 +39,5 @@
 
 		<Button Content="Save Settings" Grid.Row="5" Click="SaveTest_Click" />
 		<Button Content="Load Settings" Grid.Row="6" Click="LoadTest_Click" />
-
-		<Button Content="Set Colors" Grid.Row="8" Click="SetColorTest_Click" />
-		<Button Content="Pulse Colors" Grid.Row="9" Click="PulseColorTest_Click" />
 	</Grid>
 </Window>

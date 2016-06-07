@@ -45,21 +45,17 @@ namespace LogiRGB {
 		//
 
 		private void Window_Loaded(object sender, RoutedEventArgs e) {
+			Debug.WriteLine("Loaded!");
 			((App)Application.Current).colorManager.ColorChanged += ColorManager_ColorChanged;
 		}
 
 		private void ColorManager_ColorChanged(object sender, ColorChangedEventArgs e) {
-			var colors = e.AllColors;
+			var newColor = e.NewColor.MoreIntenseColor();
 
-			Debug.WriteLine("All colors: " + string.Join(", ", colors.Select(c => c.ToString())));
-
-			Border[] colorBorders = { color1, color2, color3, color4 };
-			foreach (Border b in colorBorders) {
-				b.Background = new SolidColorBrush(MColor.FromArgb(200, 255, 255, 255));
-			}
-			for (int i = 0; i < colors.Length; i++) {
-				colorBorders[i].Background = new SolidColorBrush(Helpers.ToMediaColor(colors[i]));
-			}
+			colorBorder.Background = new SolidColorBrush(e.NewColor.ToMediaColor());
+			colorBorderNew.Background = new SolidColorBrush(newColor.ToMediaColor());
+			colorLabel.Content = e.NewColor.ToHexString() + " - " + $"({e.NewColor.GetHue()}, {e.NewColor.GetSaturation()}, {e.NewColor.GetBrightness()})";
+			colorLabelNew.Content = newColor.ToHexString() + "\n" + $"({newColor.GetHue()}, {newColor.GetSaturation()}, {newColor.GetBrightness()})";
 		}
 
 		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
@@ -96,18 +92,6 @@ namespace LogiRGB {
 
 			Debug.WriteLine(string.Join(", ", settings.FallbackColor));
 			Debug.WriteLine(string.Join(", ", settings.HashesAndColors));
-		}
-
-		private void SetColorTest_Click(object sender, RoutedEventArgs e) {
-			var colR = (int)SliderR.Value;
-			var colG = (int)SliderG.Value;
-			var colB = (int)SliderB.Value;
-
-			LogitechGSDK.LogiLedSetLighting(colR, colG, colB);
-		}
-
-		private void PulseColorTest_Click(object sender, RoutedEventArgs e) {
-			
 		}
 	}
 }

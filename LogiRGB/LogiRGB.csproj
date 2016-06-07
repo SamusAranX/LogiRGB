@@ -99,6 +99,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ColorManager.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="FocusWatcher.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="IconExtractor\IconExtractor.cs" />
