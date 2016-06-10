@@ -1,18 +1,22 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Configuration;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+
 using Hardcodet.Wpf.TaskbarNotification;
+using LogiRGB.Managers;
+using PluginContracts;
 
 using DColor = System.Drawing.Color;
 using DSize = System.Drawing.Size;
@@ -36,7 +40,7 @@ namespace LogiRGB {
 
 			colorManager = new ColorManager(Helpers.ByteArrayToColor(settings.FallbackColor));
 			colorManager.InitializeSDK();
-			//colorManager.ColorChanged += ColorManager_ColorChanged;
+			colorManager.ColorChanged += ColorManager_ColorChanged;
 
 			focusWatcher = new FocusWatcher();
 			focusWatcher.FocusChanged += FocusWatcher_FocusChanged;
@@ -45,16 +49,27 @@ namespace LogiRGB {
 			//if(!IsAdministrator()) {
 			//	MessageBox.Show("Without administrator privileges, LogiRGB won't be able to read some applications' data.\nYou don't have to grant it these privileges, but without them, some applications will not trigger a color change.", "LogiRGB", MessageBoxButton.OK, MessageBoxImage.Information);
 			//}
+
+			taskbarIcon.ShowBalloonTip("LogiRGB", "LogiRGB is now running.", BalloonIcon.Info);
+		}
+
+		private void About_Click(object sender, RoutedEventArgs e) {
+			Debug.WriteLine("Display About window");
+		}
+
+		private void Exit_Click(object sender, RoutedEventArgs e) {
+			Current.Shutdown();
 		}
 
 		private void ColorManager_ColorChanged(object sender, ColorChangedEventArgs e) {
 			Debug.WriteLine("Color changed: " + e.NewColor.ToString());
-
-
 		}
 
 		private void FocusWatcher_FocusChanged(object sender, FocusChangedEventArgs e) {
 			Debug.WriteLine(e.Filename);
+
+			if (e.Filename == Assembly.GetExecutingAssembly().Location)
+				return; // Exclude LogiRGB
 
 			using (FileStream fs = File.OpenRead(e.Filename))
 			using (SHA1 sha1 = SHA1.Create()) {
@@ -69,7 +84,7 @@ namespace LogiRGB {
 					var color = Helpers.ByteArrayToColor(colorBytes);
 
 					Debug.WriteLine("Dictionary hit! " + color.ToString());
-
+					
 					colorManager.SetColor(color);
 				} else {
 					//
@@ -117,7 +132,8 @@ namespace LogiRGB {
 				settingsWindow.Show();
 			} else {
 				var settingsWindow = openWindows.First();
-				settingsWindow.Focus();
+				//settingsWindow.Focus();
+				settingsWindow.Activate();
 			}
 		}
 

@@ -6,38 +6,77 @@
         xmlns:local="clr-namespace:LogiRGB" UseLayoutRounding="True"
         mc:Ignorable="d" Loaded="Window_Loaded" Closing="Window_Closing" Topmost="True"
         Title="LogiRGB Settings" Icon="Images/LogiRGB.ico" Height="426" Width="240">
+	<Window.Background>
+		<RadialGradientBrush GradientOrigin="0.5,0" RadiusX="1.25" RadiusY="0.55" Center="0.5,0.5">
+			<GradientStop Color="#3C3B3D" Offset="0" />
+			<GradientStop Color="#1B1B1C" Offset="1" />
+		</RadialGradientBrush>
+	</Window.Background>
 	<Window.Resources>
-		<DropShadowEffect x:Key="dropshadow" ShadowDepth="1" BlurRadius="4" Direction="270" RenderingBias="Quality"/>
+		<DropShadowEffect x:Key="DropShadow" ShadowDepth="1" BlurRadius="4" Direction="270" RenderingBias="Quality"/>
+		<SkewTransform x:Key="OWSkew" AngleX="-15" />
+
+		<LinearGradientBrush x:Key="HeaderInnerShadow" EndPoint="0,1">
+			<GradientStop Color="#40000000" Offset="0" />
+			<GradientStop Color="#00000000" Offset="0.1" />
+			<GradientStop Color="#00FFFFFF" Offset="0.95" />
+			<GradientStop Color="#40FFFFFF" Offset="1" />
+		</LinearGradientBrush>
 	</Window.Resources>
 	<Grid>
 		<Grid.RowDefinitions>
+			<RowDefinition Height="30" />
 			<RowDefinition Height="128" />
-			<RowDefinition Height="20" />
-			<RowDefinition Height="20" />
-			<RowDefinition Height="20" />
-			<RowDefinition Height="20" />
-			<RowDefinition Height="20" />
-			<RowDefinition Height="20" />
-			<RowDefinition Height="20" />
-			<RowDefinition Height="20" />
-			<RowDefinition Height="20" />
+			<RowDefinition Height="30" />
+			<RowDefinition Height="100" />
+			<RowDefinition Height="30" />
+			<RowDefinition />
 		</Grid.RowDefinitions>
 
+		<Border Background="{StaticResource HeaderInnerShadow}">
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="11" />
+					<ColumnDefinition Width="8" />
+					<ColumnDefinition Width="8" />
+					<ColumnDefinition Width="8" />
+					<ColumnDefinition />
+				</Grid.ColumnDefinitions>
 
-		<Border Grid.Row="0" Margin="4" CornerRadius="4" x:Name="colorBorder" />
-		<Border Grid.Row="0" Margin="32" CornerRadius="4" x:Name="colorBorderNew" />
-		<Label Grid.Row="0" Content="#FFFFFF" x:Name="colorLabel" Foreground="White" Effect="{StaticResource dropshadow}"
-				HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,4,0,0"
-				FontSize="16" FontFamily="Iosevka Slab Medium Oblique" />
-		<Label Grid.Row="0" Content="#FFFFFF" x:Name="colorLabelNew" Foreground="White" Effect="{StaticResource dropshadow}"
-				HorizontalAlignment="Center" VerticalAlignment="Center" 
-				FontSize="16" FontFamily="Iosevka Slab Medium Oblique" />
+				<Border Grid.Column="1" Background="#FF6000" RenderTransform="{StaticResource OWSkew}" />
+				<Border Grid.Column="2" Background="#00FF42" RenderTransform="{StaticResource OWSkew}" />
+				<Border Grid.Column="3" Background="#0080FF" RenderTransform="{StaticResource OWSkew}" />
 
-		<Slider x:Name="SliderR" Grid.Row="2" Value="255" Maximum="255" />
-		<Slider x:Name="SliderG" Grid.Row="3" Value="127" Maximum="255" />
-		<Slider x:Name="SliderB" Grid.Row="4" Maximum="255" />
+				<Label Grid.Column="4" Content="Color Preview" Foreground="White" FontSize="16"
+						Padding="0" VerticalAlignment="Center" Margin="8,0,0,0" Effect="{StaticResource DropShadow}" />
+			</Grid>
+		</Border>
 
-		<Button Content="Save Settings" Grid.Row="5" Click="SaveTest_Click" />
-		<Button Content="Load Settings" Grid.Row="6" Click="LoadTest_Click" />
+
+		<Border Grid.Row="1" Margin="4" CornerRadius="4" x:Name="colorBorder" />
+		<Label Grid.Row="1" Content="#FFFFFF" x:Name="colorLabel" Foreground="White" Effect="{StaticResource DropShadow}"
+				HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,4,0,0"
+				FontSize="20" />
+
+		<Border Grid.Row="2" Background="{StaticResource HeaderInnerShadow}">
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="11" />
+					<ColumnDefinition Width="8" />
+					<ColumnDefinition Width="8" />
+					<ColumnDefinition Width="8" />
+					<ColumnDefinition />
+				</Grid.ColumnDefinitions>
+
+				<Border Grid.Column="1" Background="#FF6000" RenderTransform="{StaticResource OWSkew}" />
+				<Border Grid.Column="2" Background="#00FF42" RenderTransform="{StaticResource OWSkew}" />
+				<Border Grid.Column="3" Background="#0080FF" RenderTransform="{StaticResource OWSkew}" />
+
+				<Label Grid.Column="4" Content="Settings" Foreground="White" FontSize="16"
+						Padding="0" VerticalAlignment="Center" Margin="8,0,0,0" Effect="{StaticResource DropShadow}" />
+			</Grid>
+		</Border>
+
+		<ListView Grid.Row="3" />
 	</Grid>
 </Window>

@@ -11,11 +11,13 @@
 		<ResourceDictionary>
 			<my:ShowWindowCommand x:Key="showWindowCommand" />
 
-			<tb:TaskbarIcon x:Key="taskbarIcon" IconSource="Images/LogiRGB.ico" ToolTip="what" DoubleClickCommand="{StaticResource showWindowCommand}">
-				<!--<tb:TaskbarIcon.ContextMenu>
-					
-				</tb:TaskbarIcon.ContextMenu>-->
-			</tb:TaskbarIcon>
+			<ContextMenu x:Key="contextMenu">
+				<MenuItem Click="About_Click" Header="About LogiRGB" />
+				<MenuItem Click="Exit_Click" Header="Exit" />
+			</ContextMenu>
+
+			<tb:TaskbarIcon x:Key="taskbarIcon" IconSource="Images/LogiRGB.ico" ToolTip="LogiRGB"
+							DoubleClickCommand="{StaticResource showWindowCommand}" ContextMenu="{StaticResource contextMenu}" />
 
 			<!--<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="Styles/AdobeSlider.xaml" />

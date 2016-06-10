@@ -17,6 +17,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using LogiRGB.Managers;
+using Microsoft.Win32;
 using TsudaKageyu;
 
 using MColor = System.Windows.Media.Color;
@@ -36,8 +38,11 @@ namespace LogiRGB {
 			return principal.IsInRole(WindowsBuiltInRole.Administrator);
 		}
 
-		private void button_Click(object sender, RoutedEventArgs e) {
-			Application.Current.Shutdown();
+		private bool IsStartupItem() {
+			// The path to the key where Windows looks for startup applications
+			RegistryKey rkApp = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+
+			return rkApp.GetValue("LogiRGB") != null;
 		}
 
 		//
@@ -53,9 +58,7 @@ namespace LogiRGB {
 			var newColor = e.NewColor.MoreIntenseColor();
 
 			colorBorder.Background = new SolidColorBrush(e.NewColor.ToMediaColor());
-			colorBorderNew.Background = new SolidColorBrush(newColor.ToMediaColor());
-			colorLabel.Content = e.NewColor.ToHexString() + " - " + $"({e.NewColor.GetHue()}, {e.NewColor.GetSaturation()}, {e.NewColor.GetBrightness()})";
-			colorLabelNew.Content = newColor.ToHexString() + "\n" + $"({newColor.GetHue()}, {newColor.GetSaturation()}, {newColor.GetBrightness()})";
+			colorLabel.Content = e.NewColor.ToHexString();
 		}
 
 		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
@@ -77,6 +80,10 @@ namespace LogiRGB {
 				for (int i = 0; i < loopMax; i++) {
 					byte[] testColors = new byte[3];
 					r.NextBytes(testColors);
+
+					//var testInfo = new Settings.ColorInfo();
+					//testInfo.Colors = testColors;
+					//testInfo.PreferredColor = 0;
 
 					settings.HashesAndColors.Add("key" + i.ToString(), testColors);
 				}

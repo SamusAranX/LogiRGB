@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LogiRGB {
+namespace LogiRGB.Managers {
 	public class FocusWatcher {
 
 		WinApi.WinEventDelegate dele = null;

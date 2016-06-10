@@ -77,6 +77,7 @@
       <HintPath>..\..\..\..\Downloads\nQuant-1.0.3\net40\nQuant.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web.Extensions" />
@@ -98,18 +99,20 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ColorManager.cs" />
+    <Compile Include="Managers\ColorManager.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="FocusWatcher.cs" />
+    <Compile Include="Managers\FocusWatcher.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="IconExtractor\IconExtractor.cs" />
     <Compile Include="IconExtractor\IconUtil.cs" />
     <Compile Include="IconExtractor\NativeMethods.cs" />
     <Compile Include="LogitechGSDK.cs" />
+    <Compile Include="Managers\PluginManager.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="StyleTestWindow.xaml.cs">
       <DependentUpon>StyleTestWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Managers\UpdateManager.cs" />
     <Compile Include="WinAPI.cs" />
     <Page Include="SettingsWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -171,7 +174,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\PluginContracts\PluginContracts.csproj">
+      <Project>{e94d7e39-dc03-4068-b277-8adecb4feeea}</Project>
+      <Name>PluginContracts</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -15,7 +15,7 @@ using MColor = System.Windows.Media.Color;
 using Env = System.Environment;
 using System.Security.Cryptography;
 
-namespace LogiRGB {
+namespace LogiRGB.Managers {
 	public class ColorManager {
 
 		private DColor _currentColor;
@@ -63,7 +63,7 @@ namespace LogiRGB {
 		/// <param name="image">The image to be analyzed</param>
 		/// <param name="tolerance">Tolerance with which to check for monochrome colors.</param>
 		/// <returns>Returns a sorted array of the four most dominant colors</returns>
-		public static DColor[] AnalyzeImage(Bitmap image, int tolerance = 32) {
+		public static DColor[] AnalyzeImage(Bitmap image, int tolerance = 32, bool allowMonochrome = false) {
 			var wu = new nQuant.WuQuantizer();
 			var quantizedBitmap = new Bitmap(wu.QuantizeImage(image, 40, 70));
 
@@ -78,7 +78,7 @@ namespace LogiRGB {
 #endif
 
 			int pixelSize = 4;
-			Dictionary<int, int> colorDict = new Dictionary<int, int>();
+			Dictionary<int, int> colorDict = new Dictionary<int, int>(); // Dictionary to sort colors with
 
 			var imgData = quantizedBitmap.LockBits(new Rectangle(System.Drawing.Point.Empty, quantizedBitmap.Size), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
 			unsafe
