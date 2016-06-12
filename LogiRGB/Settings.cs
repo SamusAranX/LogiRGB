@@ -20,7 +20,7 @@ namespace LogiRGB {
 		public Dictionary<string, byte[]> HashesAndColors;
 		public byte[] FallbackColor;
 		public bool AutostartEnabled;
-		public Guid ActivePlugin;
+		public string[] ActivePluginGUIDs;
 
 		private static string _settingsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "LogiRGB", "settings.json");
 
@@ -31,7 +31,7 @@ namespace LogiRGB {
 			HashesAndColors = new Dictionary<string, byte[]>();
 			FallbackColor = new byte[] { 0, 127, 255 };
 			AutostartEnabled = false;
-			ActivePlugin = new Guid("F8E24D27-9D2F-4775-A6CE-16B7FE69A841"); // The Logitech plugin's GUID. Cheap, I know
+			ActivePluginGUIDs = new string[] {"F8E24D27-9D2F-4775-A6CE-16B7FE69A841" }; // The Logitech plugin's GUID. Cheap, I know
 		}
 
 		public static Settings LoadSettings() {

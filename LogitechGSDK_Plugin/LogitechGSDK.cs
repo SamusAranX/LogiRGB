@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Runtime.InteropServices;
 
-namespace LogiRGB {
+namespace LogitechGSDK_Plugin {
 
 	public enum KeyboardNames {
 		ESC = 0x01,

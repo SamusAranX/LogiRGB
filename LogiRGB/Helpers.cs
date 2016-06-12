@@ -21,9 +21,7 @@ using MColor = System.Windows.Media.Color;
 
 namespace LogiRGB {
 	public static class Helpers {
-		public struct LogitechColorPercentage {
-			public int R, G, B;
-		}
+		
 
 		// Gets the biggest icon of an .exe file
 		public static Bitmap GetEXEIconBitmap(string path) {
@@ -44,15 +42,6 @@ namespace LogiRGB {
 			} 
 
 			return DColor.FromArgb(bytes[0], bytes[1], bytes[2]);
-		}
-
-		public static LogitechColorPercentage ColorToPercentage(DColor col) {
-			var pct = new LogitechColorPercentage();
-			pct.R = (int)Math.Min(col.R / 2.55, 100);
-			pct.G = (int)Math.Min(col.G / 2.55, 100);
-			pct.B = (int)Math.Min(col.B / 2.55, 100);
-
-			return pct;
 		}
 
 		/// <summary>

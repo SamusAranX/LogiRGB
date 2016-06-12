@@ -9,6 +9,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows;
@@ -29,6 +30,7 @@ namespace LogiRGB {
 
 		public ColorManager colorManager;
 		public FocusWatcher focusWatcher;
+		public PluginManager pluginManager;
 
 		private TaskbarIcon taskbarIcon;
 		public Settings settings;
@@ -36,15 +38,19 @@ namespace LogiRGB {
 		private void Application_Startup(object sender, StartupEventArgs e) {
 			taskbarIcon = (TaskbarIcon)FindResource("taskbarIcon");
 
+			pluginManager = new PluginManager();
+
 			settings = Settings.LoadSettings();
 
 			colorManager = new ColorManager(Helpers.ByteArrayToColor(settings.FallbackColor));
-			colorManager.InitializeSDK();
+			colorManager.InitializeSDKs();
 			colorManager.ColorChanged += ColorManager_ColorChanged;
 
 			focusWatcher = new FocusWatcher();
 			focusWatcher.FocusChanged += FocusWatcher_FocusChanged;
 			focusWatcher.StartWatching();
+
+			
 
 			//if(!IsAdministrator()) {
 			//	MessageBox.Show("Without administrator privileges, LogiRGB won't be able to read some applications' data.\nYou don't have to grant it these privileges, but without them, some applications will not trigger a color change.", "LogiRGB", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -68,7 +74,7 @@ namespace LogiRGB {
 		private void FocusWatcher_FocusChanged(object sender, FocusChangedEventArgs e) {
 			Debug.WriteLine(e.Filename);
 
-			if (e.Filename == Assembly.GetExecutingAssembly().Location)
+			if (e.Filename == Assembly.GetExecutingAssembly().Location || e.Filename.EndsWith("LogiRGB.vshost.exe"))
 				return; // Exclude LogiRGB
 
 			using (FileStream fs = File.OpenRead(e.Filename))

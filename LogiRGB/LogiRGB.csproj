@@ -106,7 +106,6 @@
     <Compile Include="IconExtractor\IconExtractor.cs" />
     <Compile Include="IconExtractor\IconUtil.cs" />
     <Compile Include="IconExtractor\NativeMethods.cs" />
-    <Compile Include="LogitechGSDK.cs" />
     <Compile Include="Managers\PluginManager.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="StyleTestWindow.xaml.cs">
@@ -168,11 +167,6 @@
     <Resource Include="Images\LogiRGB.ico" />
     <Resource Include="Images\logirgb4.png" />
     <Resource Include="Images\logirgb_32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="LogitechLedEnginesWrapper.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PluginContracts\PluginContracts.csproj">

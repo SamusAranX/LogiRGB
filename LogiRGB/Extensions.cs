@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
-
+using PluginContracts;
 using DColor = System.Drawing.Color;
 using DSize = System.Drawing.Size;
 using MColor = System.Windows.Media.Color;
@@ -34,6 +34,13 @@ namespace LogiRGB {
 			}
 
 			return bs;
+		}
+
+		public static Guid GetPluginGuid(this IPlugin plugin) {
+			var assembly = plugin.GetType().Assembly;
+			var attribute = (GuidAttribute)assembly.GetCustomAttributes(typeof(GuidAttribute), true)[0];
+			var id = attribute.Value;
+			return new Guid(id);
 		}
 
 		// Converts a WPF Color object to a GDI+ Color object

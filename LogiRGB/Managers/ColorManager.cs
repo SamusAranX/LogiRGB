@@ -14,6 +14,10 @@ using DSize = System.Drawing.Size;
 using MColor = System.Windows.Media.Color;
 using Env = System.Environment;
 using System.Security.Cryptography;
+using PluginContracts;
+using System.Runtime.InteropServices;
+using System.Diagnostics;
+using LogiRGB.Managers;
 
 namespace LogiRGB.Managers {
 	public class ColorManager {
@@ -29,27 +33,58 @@ namespace LogiRGB.Managers {
 			_currentColor = fallback;
 		}
 
-		public bool InitializeSDK() {
-			if (!LogitechGSDK.LogiLedInit())
-				return false; // Don't return the result of the following calls. If this one fails, get the heck outta here.
 
-			LogitechGSDK.LogiLedSetTargetDevice(LogitechGSDK.LOGI_DEVICETYPE_ALL);
-			LogitechGSDK.LogiLedSaveCurrentLighting();
+		public void InitializeSDKs() {
+			var activePluginGUIDs = ((App)App.Current).settings.ActivePluginGUIDs;
+			var plugins = ((App)App.Current).pluginManager.Plugins
+				.Where(p => activePluginGUIDs.Contains(p.Metadata.GUID));
 
-			return true;
+			foreach (var lazyPlugin in plugins) {
+				var plugin = lazyPlugin.Value;
+				try {
+					if (!plugin.Initialize()) {
+						Debug.WriteLine($"Plugin \"{lazyPlugin.Metadata.Name}\" couldn't be loaded. (Initialize)");
+					}
+				} catch (Exception) {
+					Debug.WriteLine($"Plugin \"{lazyPlugin.Metadata.Name}\" couldn't be loaded. (Exception)");
+					throw;
+				}
+			}
 		}
 
 		public void Shutdown() {
-			LogitechGSDK.LogiLedRestoreLighting();
-			LogitechGSDK.LogiLedShutdown();
+			var activePluginGUIDs = ((App)App.Current).settings.ActivePluginGUIDs;
+			var plugins = ((App)App.Current).pluginManager.Plugins
+				.Where(p => activePluginGUIDs.Contains(p.Metadata.GUID));
+
+			foreach (var lazyPlugin in plugins) {
+				var plugin = lazyPlugin.Value;
+				try {
+					plugin.Shutdown();
+				} catch (Exception) {
+					Debug.WriteLine($"Plugin \"{lazyPlugin.Metadata.Name}\" couldn't be shut down. (Exception)");
+					throw;
+				}
+			}
 		}
 
 		public bool SetColor(DColor newColor) {
-			var pct = Helpers.ColorToPercentage(newColor);
+			var activePluginGUIDs = ((App)App.Current).settings.ActivePluginGUIDs;
+			var plugins = ((App)App.Current).pluginManager.Plugins
+				.Where(p => activePluginGUIDs.Contains(p.Metadata.GUID));
 
-			if (!LogitechGSDK.LogiLedSetLighting(pct.R, pct.G, pct.B))
-				return false;
-			
+			foreach (var lazyPlugin in plugins) {
+				var plugin = lazyPlugin.Value;
+				try {
+					if (!plugin.SetColor(newColor)) {
+						Debug.WriteLine($"Plugin \"{lazyPlugin.Metadata.Name}\" failed when setting color. (Initialize)");
+					}
+				} catch (Exception) {
+					Debug.WriteLine($"Plugin \"{lazyPlugin.Metadata.Name}\" failed when setting color. (Exception)");
+					throw;
+				}
+			}
+
 			_currentColor = newColor;
 
 			OnColorChanged(_currentColor);
