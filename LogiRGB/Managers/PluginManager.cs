@@ -13,7 +13,7 @@ namespace LogiRGB.Managers {
 	public class PluginManager {
 
 		[ImportMany(typeof(IPlugin))]
-		public Lazy<IPlugin, IPluginMetadata>[] Plugins {
+		public IEnumerable<Lazy<IPlugin, IPluginMetadata>> Plugins {
 			get; set;
 		}
 
@@ -27,8 +27,7 @@ namespace LogiRGB.Managers {
 
 			//Fill the imports of this object 
 			container.ComposeParts(this);
-
-			Plugins = container.GetExports<IPlugin, IPluginMetadata>().ToArray();
+			
 			Debug.WriteLine("Plugin count: " + Plugins.Count().ToString());
 		}
 	}

@@ -14,7 +14,7 @@ namespace LogitechGSDK_Plugin {
 	[ExportMetadata("Name", "Logitech RGB LED Plugin")]
 	[ExportMetadata("Version", "1.0")]
 	[ExportMetadata("Author", "Peter Wunder")]
-	[ExportMetadata("GUID", "c8cf0eab - 2bb0 - 4bcb - 8122 - 560281515295")]
+	[ExportMetadata("GUID", "c8cf0eab-2bb0-4bcb-8122-560281515295")]
 	public class LogitechPlugin : IPlugin {
 
 		public string Description {
