@@ -21,8 +21,8 @@ namespace PluginContracts {
 
 	public interface IPluginMetadata {
 		string Name { get; }
-		string Version { get; }
 		string Author { get; }
+		string Version { get; }
 
 		string GUID { get; }
 	}

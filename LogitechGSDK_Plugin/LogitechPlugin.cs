@@ -5,16 +5,12 @@ using System.Drawing;
 using PluginContracts;
 
 namespace LogitechGSDK_Plugin {
-	//string Name { get; }
-	//string Description { get; }
-	//string Version { get; }
-	//string Author { get; }
-	//string Website { get; }
+
 	[Export(typeof(IPlugin))]
 	[ExportMetadata("Name", "Logitech RGB LED Plugin")]
-	[ExportMetadata("Version", "1.0")]
 	[ExportMetadata("Author", "Peter Wunder")]
-	[ExportMetadata("GUID", "c8cf0eab-2bb0-4bcb-8122-560281515295")]
+	[ExportMetadata("Version", "1.0")]
+	[ExportMetadata("GUID", "C8CF0EAB-2BB0-4BCB-8122-560281515295")]
 	public class LogitechPlugin : IPlugin {
 
 		public string Description {
@@ -31,11 +27,13 @@ namespace LogitechGSDK_Plugin {
 
 		public string Website {
 			get {
-				return "http://peterwunder.de";
+				return "https://peterwunder.de";
 			}
 		}
 
 		public bool Initialize() {
+			Debug.WriteLine(this.GetType().Name + ": Initialize");
+
 			if (!LogitechGSDK.LogiLedInit())
 				return false; // Don't return the result of the following calls. If this one fails, get the heck outta here.
 
@@ -46,19 +44,22 @@ namespace LogitechGSDK_Plugin {
 		}
 
 		public bool SetColor(Color c) {
+			Debug.WriteLine(this.GetType().Name + ": SetColor");
+
 			var col = c.MoreIntenseColor();
 
 			var r = (int)Math.Min(col.R / 2.55, 100);
 			var g = (int)Math.Min(col.G / 2.55, 100);
 			var b = (int)Math.Min(col.B / 2.55, 100);
 
-			Debug.WriteLine(this.GetType().Name + ": SetColor");
-			Debug.WriteLine("Changing color: " + col.ToString());
+			Debug.WriteLine("Changing color to " + col.ToString());
 
 			return LogitechGSDK.LogiLedSetLighting(r, g, b);
 		}
 
 		public void Shutdown() {
+			Debug.WriteLine(this.GetType().Name + ": Shutdown");
+
 			LogitechGSDK.LogiLedRestoreLighting();
 			LogitechGSDK.LogiLedShutdown();
 		}
