@@ -51,11 +51,17 @@ namespace LogiRGB {
 
 		private void Window_Loaded(object sender, RoutedEventArgs e) {
 			Debug.WriteLine("Loaded!");
+
+			var currentColor = ((App)App.Current).colorManager.CurrentColor;
+			colorBorder.Background = new SolidColorBrush(currentColor.ToMediaColor());
+			colorLabel.Content = currentColor.ToHexString();
+
 			((App)Application.Current).colorManager.ColorChanged += ColorManager_ColorChanged;
+
 		}
 
 		private void ColorManager_ColorChanged(object sender, ColorChangedEventArgs e) {
-			var newColor = e.NewColor.MoreIntenseColor();
+			var newColor = e.NewColor;
 
 			colorBorder.Background = new SolidColorBrush(e.NewColor.ToMediaColor());
 			colorLabel.Content = e.NewColor.ToHexString();

@@ -33,13 +33,24 @@ namespace LogiRGB.Managers {
 			_currentColor = fallback;
 		}
 
+		private IEnumerable<Lazy<IPlugin, IPluginMetadata>> GetActivePlugins() {
+			var activePluginGUIDs = ((App)App.Current).settings.ActivePluginGUIDs.Select(g => new Guid(g));
+			string.Join(", ", activePluginGUIDs.Select(g => g.ToString()));
+
+			return ((App)App.Current).pluginManager.Plugins
+				.Where(p => activePluginGUIDs.Contains(new Guid(p.Metadata.GUID)));
+		}
 
 		public void InitializeSDKs() {
-			var activePluginGUIDs = ((App)App.Current).settings.ActivePluginGUIDs;
-			var plugins = ((App)App.Current).pluginManager.Plugins
-				.Where(p => activePluginGUIDs.Contains(p.Metadata.GUID));
+			var plugins = GetActivePlugins();
+			Debug.WriteLine(plugins.Count());
 
 			foreach (var lazyPlugin in plugins) {
+				if (lazyPlugin.IsValueCreated) {
+					Debug.WriteLine($"Plugin \"{lazyPlugin.Metadata.Name}\" is already initialized. Skipping.");
+					continue;
+				}
+
 				var plugin = lazyPlugin.Value;
 				try {
 					if (!plugin.Initialize()) {
@@ -53,11 +64,12 @@ namespace LogiRGB.Managers {
 		}
 
 		public void Shutdown() {
-			var activePluginGUIDs = ((App)App.Current).settings.ActivePluginGUIDs;
-			var plugins = ((App)App.Current).pluginManager.Plugins
-				.Where(p => activePluginGUIDs.Contains(p.Metadata.GUID));
+			var plugins = GetActivePlugins();
 
 			foreach (var lazyPlugin in plugins) {
+				if (!lazyPlugin.IsValueCreated)
+					continue;
+
 				var plugin = lazyPlugin.Value;
 				try {
 					plugin.Shutdown();
@@ -69,9 +81,7 @@ namespace LogiRGB.Managers {
 		}
 
 		public bool SetColor(DColor newColor) {
-			var activePluginGUIDs = ((App)App.Current).settings.ActivePluginGUIDs;
-			var plugins = ((App)App.Current).pluginManager.Plugins
-				.Where(p => activePluginGUIDs.Contains(p.Metadata.GUID));
+			var plugins = GetActivePlugins();
 
 			foreach (var lazyPlugin in plugins) {
 				var plugin = lazyPlugin.Value;

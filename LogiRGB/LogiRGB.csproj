@@ -169,6 +169,9 @@
     <Resource Include="Images\logirgb_32.png" />
   </ItemGroup>
   <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\PluginContracts\PluginContracts.csproj">
       <Project>{e94d7e39-dc03-4068-b277-8adecb4feeea}</Project>
       <Name>PluginContracts</Name>

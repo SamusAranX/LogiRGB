@@ -88,16 +88,18 @@ namespace LogiRGB {
 		}
 
 		public static DColor MoreIntenseColor(this DColor col) {
-			Debug.WriteLine("MoreIntenseColor: " + col.ToString());
+			//Debug.WriteLine("MoreIntenseColor: " + col.ToString());
 
 			var hue = col.GetHue();
 			var sat = col.GetSaturation();
 			var bri = col.GetBrightness();
-			Debug.WriteLine($"MoreIntenseColor: {hue}-{sat}-{bri}");
+			//Debug.WriteLine($"MoreIntenseColor: {hue}-{sat}-{bri}");
 
+			// If color is already pretty intense, don't modify it any further
 			if ((sat >= 0.5f && sat <= 0.9f) && (bri >= 0.5f && bri <= 0.6f))
 				return col;
 
+			// If color doesn't look intense, make it more intense
 			if (sat < 0.5f)
 				sat = 0.5f;
 			if (sat > 0.8f)
@@ -107,14 +109,10 @@ namespace LogiRGB {
 				bri = 0.5f;
 			if (bri > 0.65f)
 				bri = 0.6f;
-
-			// arbitrary values, yay!
-			//sat = 0.95f;
-			//bri = 0.55f;
 			
-			Debug.WriteLine($"MoreIntenseColor: {hue}-{sat}-{bri}");
+			//Debug.WriteLine($"MoreIntenseColor: {hue}-{sat}-{bri}");
 			var moreIntenseColor = Helpers.ColorFromAHSB(255, hue, sat, bri);
-			Debug.WriteLine("MoreIntenseColor: " + moreIntenseColor.ToString());
+			//Debug.WriteLine("MoreIntenseColor: " + moreIntenseColor.ToString());
 
 			return moreIntenseColor;
 		}

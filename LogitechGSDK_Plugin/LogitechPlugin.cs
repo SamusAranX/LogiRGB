@@ -29,7 +29,6 @@ namespace LogitechGSDK_Plugin {
 			}
 		}
 
-
 		public string Website {
 			get {
 				return "http://peterwunder.de";
@@ -47,16 +46,16 @@ namespace LogitechGSDK_Plugin {
 		}
 
 		public bool SetColor(Color c) {
-			var r = (int)Math.Min(c.R / 2.55, 100);
-			var g = (int)Math.Min(c.G / 2.55, 100);
-			var b = (int)Math.Min(c.B / 2.55, 100);
+			var col = c.MoreIntenseColor();
+
+			var r = (int)Math.Min(col.R / 2.55, 100);
+			var g = (int)Math.Min(col.G / 2.55, 100);
+			var b = (int)Math.Min(col.B / 2.55, 100);
 
 			Debug.WriteLine(this.GetType().Name + ": SetColor");
+			Debug.WriteLine("Changing color: " + col.ToString());
 
-			if (!LogitechGSDK.LogiLedSetLighting(r, g, b))
-				return false;
-
-			return true;
+			return LogitechGSDK.LogiLedSetLighting(r, g, b);
 		}
 
 		public void Shutdown() {

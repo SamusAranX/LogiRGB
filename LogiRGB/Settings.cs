@@ -31,7 +31,7 @@ namespace LogiRGB {
 			HashesAndColors = new Dictionary<string, byte[]>();
 			FallbackColor = new byte[] { 0, 127, 255 };
 			AutostartEnabled = false;
-			ActivePluginGUIDs = new string[] {"F8E24D27-9D2F-4775-A6CE-16B7FE69A841" }; // The Logitech plugin's GUID. Cheap, I know
+			ActivePluginGUIDs = new string[] { "c8cf0eab-2bb0-4bcb-8122-560281515295" }; // The Logitech plugin's GUID. Cheap, I know
 		}
 
 		public static Settings LoadSettings() {
@@ -47,7 +47,6 @@ namespace LogiRGB {
 				var json = inputFile.ReadToEnd();
 				return serializer.Deserialize<Settings>(json);
 			}
-
 		}
 
 		public bool SaveSettings() {

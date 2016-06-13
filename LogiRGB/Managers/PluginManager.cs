@@ -28,8 +28,8 @@ namespace LogiRGB.Managers {
 			//Fill the imports of this object 
 			container.ComposeParts(this);
 
-			//var stuff = container.GetExports<IPlugin, IPluginMetadata>();
-			Debug.WriteLine(Plugins);
+			Plugins = container.GetExports<IPlugin, IPluginMetadata>().ToArray();
+			Debug.WriteLine("Plugin count: " + Plugins.Count().ToString());
 		}
 	}
 }

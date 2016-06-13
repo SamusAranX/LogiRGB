@@ -41,16 +41,15 @@ namespace LogiRGB {
 			pluginManager = new PluginManager();
 
 			settings = Settings.LoadSettings();
+			Debug.WriteLine(string.Join(", ", settings.ActivePluginGUIDs));
 
 			colorManager = new ColorManager(Helpers.ByteArrayToColor(settings.FallbackColor));
 			colorManager.InitializeSDKs();
-			colorManager.ColorChanged += ColorManager_ColorChanged;
+			//colorManager.ColorChanged += ColorManager_ColorChanged;
 
 			focusWatcher = new FocusWatcher();
 			focusWatcher.FocusChanged += FocusWatcher_FocusChanged;
 			focusWatcher.StartWatching();
-
-			
 
 			//if(!IsAdministrator()) {
 			//	MessageBox.Show("Without administrator privileges, LogiRGB won't be able to read some applications' data.\nYou don't have to grant it these privileges, but without them, some applications will not trigger a color change.", "LogiRGB", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -67,9 +66,9 @@ namespace LogiRGB {
 			Current.Shutdown();
 		}
 
-		private void ColorManager_ColorChanged(object sender, ColorChangedEventArgs e) {
-			Debug.WriteLine("Color changed: " + e.NewColor.ToString());
-		}
+		//private void ColorManager_ColorChanged(object sender, ColorChangedEventArgs e) {
+		//	Debug.WriteLine("Color changed: " + e.NewColor.ToString());
+		//}
 
 		private void FocusWatcher_FocusChanged(object sender, FocusChangedEventArgs e) {
 			Debug.WriteLine(e.Filename);
@@ -109,7 +108,7 @@ namespace LogiRGB {
 					if (colors.Length == 0) {
 						newColor = Helpers.ByteArrayToColor(settings.FallbackColor);
 					} else {
-						newColor = colors[0].MoreIntenseColor();
+						newColor = colors[0];
 					}
 					
 					settings.HashesAndColors[strChecksum] = newColor.ToByteArray();
