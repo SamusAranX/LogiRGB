@@ -51,11 +51,25 @@ namespace LogiRGB {
 			focusWatcher.FocusChanged += FocusWatcher_FocusChanged;
 			focusWatcher.StartWatching();
 
+			var containsInvalidGUIDs = settings.ActivePluginGUIDs.Select(ap => Tuple.Create(ap, pluginManager.Plugins.Select(p => p.Metadata.GUID).Contains(ap)));
+			if (pluginManager.Plugins.Count() == 0) {
+				// Checking if there are plugins loaded - if not, exit.
+				taskbarIcon.ShowBalloonTip("LogiRGB", "No plugins found.\nExiting.", BalloonIcon.Warning);
+				App.Current.Shutdown();
+			} else if (containsInvalidGUIDs.All(x => x.Item2)) {
+				// With this insanely long LINQ query, we're checking whether there are GUIDs in ActivePluginGUIDs that are also not in the actual plugin list
+				// That way we know if there are any plugins that have been deleted between restarts of LogiRGB	
+				// False means that the plugin has been deleted
+
+				// Get a list of GUIDs of plugins that still exist
+				var newActivePluginGUIDs = settings.ActivePluginGUIDs.Where(g => containsInvalidGUIDs.Single(t => t.Item1 == g).Item2);
+
+				settings.ActivePluginGUIDs = newActivePluginGUIDs.ToArray();
+			}
+
 			//if(!IsAdministrator()) {
 			//	MessageBox.Show("Without administrator privileges, LogiRGB won't be able to read some applications' data.\nYou don't have to grant it these privileges, but without them, some applications will not trigger a color change.", "LogiRGB", MessageBoxButton.OK, MessageBoxImage.Information);
 			//}
-
-			taskbarIcon.ShowBalloonTip("LogiRGB", "LogiRGB is now running.", BalloonIcon.Info);
 		}
 
 		private void About_Click(object sender, RoutedEventArgs e) {

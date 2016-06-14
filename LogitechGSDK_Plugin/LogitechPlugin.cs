@@ -7,7 +7,7 @@ using PluginContracts;
 namespace LogitechGSDK_Plugin {
 
 	[Export(typeof(IPlugin))]
-	[ExportMetadata("Name", "Logitech RGB LED Plugin")]
+	[ExportMetadata("Name", "Logitech LED Illumination Plugin")]
 	[ExportMetadata("Author", "Peter Wunder")]
 	[ExportMetadata("Version", "1.0")]
 	[ExportMetadata("GUID", "C8CF0EAB-2BB0-4BCB-8122-560281515295")]
@@ -44,15 +44,13 @@ namespace LogitechGSDK_Plugin {
 		}
 
 		public bool SetColor(Color c) {
-			Debug.WriteLine(this.GetType().Name + ": SetColor");
-
 			var col = c.MoreIntenseColor();
 
 			var r = (int)Math.Min(col.R / 2.55, 100);
 			var g = (int)Math.Min(col.G / 2.55, 100);
 			var b = (int)Math.Min(col.B / 2.55, 100);
 
-			Debug.WriteLine("Changing color to " + col.ToString());
+			Debug.WriteLine(this.GetType().Name + ": SetColor " + col.ToString());
 
 			return LogitechGSDK.LogiLedSetLighting(r, g, b);
 		}

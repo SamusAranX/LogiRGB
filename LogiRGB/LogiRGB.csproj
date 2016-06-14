@@ -112,6 +112,8 @@
       <DependentUpon>StyleTestWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Managers\UpdateManager.cs" />
+    <Compile Include="Value Converters\BaseConverter.cs" />
+    <Compile Include="Value Converters\SettingsPluginMetadataConverter.cs" />
     <Compile Include="WinAPI.cs" />
     <Page Include="SettingsWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -167,9 +169,6 @@
     <Resource Include="Images\LogiRGB.ico" />
     <Resource Include="Images\logirgb4.png" />
     <Resource Include="Images\logirgb_32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PluginContracts\PluginContracts.csproj">

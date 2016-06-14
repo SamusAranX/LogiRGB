@@ -3,9 +3,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:LogiRGB" UseLayoutRounding="True"
+        xmlns:local="clr-namespace:LogiRGB"
+		xmlns:conv="clr-namespace:LogiRGB.Converters"
+		UseLayoutRounding="True"
         mc:Ignorable="d" Loaded="Window_Loaded" Closing="Window_Closing" Topmost="True"
-        Title="LogiRGB Settings" Icon="Images/LogiRGB.ico" Height="426" Width="240">
+        Title="LogiRGB Settings" Icon="Images/LogiRGB.ico" Height="442" Width="304">
 	<Window.Background>
 		<RadialGradientBrush GradientOrigin="0.5,0" RadiusX="1.25" RadiusY="0.55" Center="0.5,0.5">
 			<GradientStop Color="#3C3B3D" Offset="0" />
@@ -15,13 +17,6 @@
 	<Window.Resources>
 		<DropShadowEffect x:Key="DropShadow" ShadowDepth="1" BlurRadius="4" Direction="270" RenderingBias="Quality"/>
 		<SkewTransform x:Key="OWSkew" AngleX="-15" />
-
-		<LinearGradientBrush x:Key="HeaderInnerShadow" EndPoint="0,1">
-			<GradientStop Color="#40000000" Offset="0" />
-			<GradientStop Color="#00000000" Offset="0.1" />
-			<GradientStop Color="#00FFFFFF" Offset="0.95" />
-			<GradientStop Color="#40FFFFFF" Offset="1" />
-		</LinearGradientBrush>
 	</Window.Resources>
 	<Grid>
 		<Grid.RowDefinitions>
@@ -33,7 +28,7 @@
 			<RowDefinition />
 		</Grid.RowDefinitions>
 
-		<Border Background="{StaticResource HeaderInnerShadow}">
+		<Border>
 			<Grid>
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="11" />
@@ -41,24 +36,24 @@
 					<ColumnDefinition Width="8" />
 					<ColumnDefinition Width="8" />
 					<ColumnDefinition />
+					<ColumnDefinition Width="32"/>
 				</Grid.ColumnDefinitions>
 
 				<Border Grid.Column="1" Background="#FF6000" RenderTransform="{StaticResource OWSkew}" />
 				<Border Grid.Column="2" Background="#00FF42" RenderTransform="{StaticResource OWSkew}" />
-				<Border Grid.Column="3" Background="#0080FF" RenderTransform="{StaticResource OWSkew}" />
+				<Border Grid.Column="3" Grid.ColumnSpan="2" Background="#0080FF" RenderTransform="{StaticResource OWSkew}" />
 
 				<Label Grid.Column="4" Content="Color Preview" Foreground="White" FontSize="16"
-						Padding="0" VerticalAlignment="Center" Margin="8,0,0,0" Effect="{StaticResource DropShadow}" />
+						Padding="0" VerticalAlignment="Center" Effect="{StaticResource DropShadow}" />
 			</Grid>
 		</Border>
 
 
 		<Border Grid.Row="1" Margin="4" CornerRadius="4" x:Name="colorBorder" />
 		<Label Grid.Row="1" Content="#FFFFFF" x:Name="colorLabel" Foreground="White" Effect="{StaticResource DropShadow}"
-				HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,4,0,0"
-				FontSize="20" />
+				HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" />
 
-		<Border Grid.Row="2" Background="{StaticResource HeaderInnerShadow}">
+		<Border Grid.Row="2">
 			<Grid>
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="11" />
@@ -66,17 +61,18 @@
 					<ColumnDefinition Width="8" />
 					<ColumnDefinition Width="8" />
 					<ColumnDefinition />
+					<ColumnDefinition Width="32"/>
 				</Grid.ColumnDefinitions>
 
 				<Border Grid.Column="1" Background="#FF6000" RenderTransform="{StaticResource OWSkew}" />
 				<Border Grid.Column="2" Background="#00FF42" RenderTransform="{StaticResource OWSkew}" />
-				<Border Grid.Column="3" Background="#0080FF" RenderTransform="{StaticResource OWSkew}" />
+				<Border Grid.Column="3" Grid.ColumnSpan="2" Background="#0080FF" RenderTransform="{StaticResource OWSkew}" />
 
-				<Label Grid.Column="4" Content="Settings" Foreground="White" FontSize="16"
-						Padding="0" VerticalAlignment="Center" Margin="8,0,0,0" Effect="{StaticResource DropShadow}" />
+				<Label Grid.Column="4" Content="Plugins" Foreground="White" FontSize="16"
+						Padding="0" VerticalAlignment="Center" Effect="{StaticResource DropShadow}" />
 			</Grid>
 		</Border>
 
-		<ListView Grid.Row="3" />
+		<ListView Grid.Row="3" ItemsSource="{Binding Plugins, Converter={conv:SettingsPluginMetadataConverter}}" />
 	</Grid>
 </Window>

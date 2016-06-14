@@ -19,6 +19,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using LogiRGB.Managers;
 using Microsoft.Win32;
+using PluginContracts;
 using TsudaKageyu;
 
 using MColor = System.Windows.Media.Color;
@@ -30,6 +31,10 @@ namespace LogiRGB {
 	public partial class SettingsWindow : Window {
 		public SettingsWindow() {
 			InitializeComponent();
+		}
+
+		public IEnumerable<Lazy<IPlugin, IPluginMetadata>> Plugins {
+			get { return ((App)App.Current).pluginManager.Plugins; }
 		}
 
 		public static bool IsAdministrator() {
@@ -51,6 +56,8 @@ namespace LogiRGB {
 
 		private void Window_Loaded(object sender, RoutedEventArgs e) {
 			Debug.WriteLine("Loaded!");
+
+			this.DataContext = this;
 
 			var currentColor = ((App)App.Current).colorManager.CurrentColor;
 			colorBorder.Background = new SolidColorBrush(currentColor.ToMediaColor());
