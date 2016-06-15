@@ -57,9 +57,9 @@ namespace LogiRGB {
 				taskbarIcon.ShowBalloonTip("LogiRGB", "No plugins found.\nExiting.", BalloonIcon.Warning);
 				App.Current.Shutdown();
 			} else if (containsInvalidGUIDs.All(x => x.Item2)) {
-				// With this insanely long LINQ query, we're checking whether there are GUIDs in ActivePluginGUIDs that are also not in the actual plugin list
-				// That way we know if there are any plugins that have been deleted between restarts of LogiRGB	
-				// False means that the plugin has been deleted
+				// With this insanely longuerythatdeleted LINQ q hcheckingave, wewhether there are GUIDs in ActivePluginGUIDs that are also not in the actual plugin list
+				// That way we know if there are any plugins  been're  deleted between restarts of LogiRGB	
+				// False means that the plugin has been 
 
 				// Get a list of GUIDs of plugins that still exist
 				var newActivePluginGUIDs = settings.ActivePluginGUIDs.Where(g => containsInvalidGUIDs.Single(t => t.Item1 == g).Item2);

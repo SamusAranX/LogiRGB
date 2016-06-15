@@ -38,7 +38,8 @@
   </PropertyGroup>
   <PropertyGroup />
   <PropertyGroup>
-    <ApplicationIcon>Images\LogiRGB.ico</ApplicationIcon>
+    <ApplicationIcon>
+    </ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup />
   <PropertyGroup>
@@ -108,14 +109,15 @@
     <Compile Include="IconExtractor\NativeMethods.cs" />
     <Compile Include="Managers\PluginManager.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="StyleTestWindow.xaml.cs">
-      <DependentUpon>StyleTestWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Managers\UpdateManager.cs" />
     <Compile Include="Value Converters\BaseConverter.cs" />
     <Compile Include="Value Converters\SettingsPluginMetadataConverter.cs" />
     <Compile Include="WinAPI.cs" />
-    <Page Include="SettingsWindow.xaml">
+    <Page Include="Windows\FirstStartWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\SettingsWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -123,15 +125,14 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="SettingsWindow.xaml.cs">
+    <Compile Include="Windows\FirstStartWindow.xaml.cs">
+      <DependentUpon>FirstStartWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Styles\AdobeSlider.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="StyleTestWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -166,15 +167,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\LogiRGB.ico" />
-    <Resource Include="Images\logirgb4.png" />
-    <Resource Include="Images\logirgb_32.png" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\PluginContracts\PluginContracts.csproj">
       <Project>{e94d7e39-dc03-4068-b277-8adecb4feeea}</Project>
       <Name>PluginContracts</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\LogiRGB.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -12,12 +12,12 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace LogiRGB {
+namespace LogiRGB.Windows {
 	/// <summary>
-	/// Interaction logic for StyleTestWindow.xaml
+	/// Interaction logic for FirstStartWindow.xaml
 	/// </summary>
-	public partial class StyleTestWindow : Window {
-		public StyleTestWindow() {
+	public partial class FirstStartWindow : Window {
+		public FirstStartWindow() {
 			InitializeComponent();
 		}
 	}

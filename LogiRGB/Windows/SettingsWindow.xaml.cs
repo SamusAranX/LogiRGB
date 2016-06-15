@@ -62,9 +62,15 @@ namespace LogiRGB {
 			var currentColor = ((App)App.Current).colorManager.CurrentColor;
 			colorBorder.Background = new SolidColorBrush(currentColor.ToMediaColor());
 			colorLabel.Content = currentColor.ToHexString();
+			exeNameLabel.Content = "Nothing yet.";
 
 			((App)Application.Current).colorManager.ColorChanged += ColorManager_ColorChanged;
+			((App)Application.Current).focusWatcher.FocusChanged += FocusWatcher_FocusChanged;
 
+		}
+
+		private void FocusWatcher_FocusChanged(object sender, FocusChangedEventArgs e) {
+			exeNameLabel.Content = System.IO.Path.GetFileName(e.Filename);
 		}
 
 		private void ColorManager_ColorChanged(object sender, ColorChangedEventArgs e) {
