@@ -7,7 +7,7 @@
 		xmlns:conv="clr-namespace:LogiRGB.Converters"
 		UseLayoutRounding="True"
         mc:Ignorable="d" Loaded="Window_Loaded" Closing="Window_Closing" Topmost="True"
-        Title="LogiRGB Settings" Icon="../Images/LogiRGB.ico" Height="442" Width="304">
+        Title="LogiRGB Settings" Icon="../Images/LogiRGB.ico" Height="240" Width="420">
 	<Window.Background>
 		<RadialGradientBrush GradientOrigin="0.5,0" RadiusX="1.25" RadiusY="0.55" Center="0.5,0.5">
 			<GradientStop Color="#3C3B3D" Offset="0" />
@@ -17,70 +17,121 @@
 	<Window.Resources>
 		<DropShadowEffect x:Key="DropShadow" ShadowDepth="1" BlurRadius="4" Direction="270" RenderingBias="Quality"/>
 		<SkewTransform x:Key="OWSkew" AngleX="-15" />
+
+		<CubicEase x:Key="TranslateEase" EasingMode="EaseOut" />
+
+		<ControlTemplate TargetType="{x:Type TextBox}" x:Key="shitThatIsStillNecessaryBecauseTheWPFTeamIsABunchOfMorons">
+			<ScrollViewer Name="PART_ContentHost" />
+		</ControlTemplate>
+
+		<Style TargetType="TabItem">
+			<Setter Property="Padding" Value="0" />
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="TabItem">
+						<Grid Name="TabHeaderContainer" Height="32" Width="140" ClipToBounds="True">
+							<Grid Name="TabHeaderBG">
+								<Grid.RenderTransform>
+									<TranslateTransform X="114" />
+								</Grid.RenderTransform>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="10" />
+									<ColumnDefinition Width="8" />
+									<ColumnDefinition Width="8" />
+									<ColumnDefinition />
+								</Grid.ColumnDefinitions>
+
+								<Border Grid.Column="3" Background="{StaticResource BlueBrush}" RenderTransform="{StaticResource OWSkew}" />
+								<Border Grid.Column="1" Background="{StaticResource RedBrush}" RenderTransform="{StaticResource OWSkew}" />
+								<Border Grid.Column="2" Background="{StaticResource GreenBrush}" RenderTransform="{StaticResource OWSkew}" />
+								<Border Grid.Column="3" Grid.ColumnSpan="3" Background="{StaticResource BlueBrush}" />
+							</Grid>
+
+							<Label Content="{TemplateBinding Header}" Effect="{StaticResource DropShadow}" 
+							VerticalContentAlignment="Center" HorizontalContentAlignment="Right"
+							FontSize="16" FontStyle="Italic" Foreground="White" Margin="4,0" />
+
+							<ContentPresenter x:Name="ContentSite" ContentSource="Header" Visibility="Hidden"
+								VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
+						</Grid>
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsSelected" Value="True">
+								<Trigger.EnterActions>
+									<BeginStoryboard>
+										<Storyboard>
+											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+											  Storyboard.TargetProperty="(Grid.RenderTransform).(TranslateTransform.X)" 
+											  To="0" Storyboard.TargetName="TabHeaderBG" Duration="0:0:0.33" />
+										</Storyboard>
+									</BeginStoryboard>
+								</Trigger.EnterActions>
+								<Trigger.ExitActions>
+									<BeginStoryboard>
+										<Storyboard>
+											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+											  Storyboard.TargetProperty="(Grid.RenderTransform).(TranslateTransform.X)" 
+											  To="114" Storyboard.TargetName="TabHeaderBG" Duration="0:0:0.33" />
+										</Storyboard>
+									</BeginStoryboard>
+								</Trigger.ExitActions>
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
 	</Window.Resources>
-	<Grid>
-		<Grid.RowDefinitions>
-			<RowDefinition Height="30" />
-			<RowDefinition Height="128" />
-			<RowDefinition Height="30" />
-			<RowDefinition Height="100" />
-			<RowDefinition Height="30" />
-			<RowDefinition />
-		</Grid.RowDefinitions>
 
-		<Border Grid.Row="0">
-			<Grid>
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="12" />
-					<ColumnDefinition Width="8" />
-					<ColumnDefinition Width="8" />
-					<ColumnDefinition Width="8" />
-					<ColumnDefinition />
-					<ColumnDefinition Width="32"/>
-				</Grid.ColumnDefinitions>
+	<TabControl TabStripPlacement="Left" Background="Transparent" BorderBrush="{StaticResource BlueBrush}" BorderThickness="1,0,0,0">
+		<TabItem Header="Color Preview" IsSelected="True">
+			<Border Grid.Row="1" Margin="4" CornerRadius="4" x:Name="colorBorder">
+				<StackPanel VerticalAlignment="Center" Margin="20,0">
+					<TextBox Template="{StaticResource shitThatIsStillNecessaryBecauseTheWPFTeamIsABunchOfMorons}" 
+						x:Name="colorLabel" Text="#FFFFFF" MaxLength="7"
+						Background="Transparent" BorderBrush="Transparent" Foreground="White"
+						HorizontalAlignment="Center" Effect="{StaticResource DropShadow}" 
+						FontSize="26" FontWeight="DemiBold" Padding="0"
+						LostFocus="colorLabel_LostFocus" IsReadOnly="True" />
 
-				<Border Grid.Column="1" Background="#FF6000" RenderTransform="{StaticResource OWSkew}" />
-				<Border Grid.Column="2" Background="#00FF42" RenderTransform="{StaticResource OWSkew}" />
-				<Border Grid.Column="3" Grid.ColumnSpan="2" Background="#0080FF" RenderTransform="{StaticResource OWSkew}" />
+					<Border Background="#55000000" CornerRadius="5" Padding="4,2" HorizontalAlignment="Center">
+						<Label Content="#FFFFFF" x:Name="exeNameLabel" Foreground="White" Effect="{StaticResource DropShadow}" FontSize="14" Padding="0" />
+					</Border>
+				</StackPanel>
+			</Border>
+		</TabItem>
+		<TabItem Header="Plugins">
+			<ListView Grid.Row="3" ItemsSource="{Binding Plugins, Converter={conv:SettingsPluginMetadataConverter}}" />
+		</TabItem>
+		<TabItem Header="About LogiRGB">
+			<ScrollViewer VerticalScrollBarVisibility="Auto">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="128" />
+						<RowDefinition Height="60" />
+						<RowDefinition />
+					</Grid.RowDefinitions>
 
-				<Label Grid.Column="4" Content="Color Preview" Foreground="White" FontSize="16"
-						Padding="0" VerticalAlignment="Center" Effect="{StaticResource DropShadow}" />
-			</Grid>
-		</Border>
+					<Image Grid.Row="0" Source="/LogiRGB;component/Images/logirgb5_small.png" />
 
+					<Label Grid.Row="1" Content="LogiRGB" FontSize="42" FontWeight="Medium"
+						HorizontalContentAlignment="Center"  Padding="0" Foreground="White" />
 
-		<Border Grid.Row="1" Margin="4" CornerRadius="4" x:Name="colorBorder">
-			<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-				<Label Content="#FFFFFF" x:Name="colorLabel" Foreground="White" HorizontalAlignment="Center"
-				Effect="{StaticResource DropShadow}" FontSize="26" FontWeight="DemiBold" Padding="0" />
+					<TextBlock Grid.Row="2" Foreground="White" Margin="40,0">
+					﻿IconExtractor/IconUtil for .NET
+Copyright (C) 2014 Tsuda Kageyu. All rights reserved.
 
-				<Border Background="#55000000" CornerRadius="5" Padding="4,2" HorizontalAlignment="Center">
-					<Label Content="#FFFFFF" x:Name="exeNameLabel" Foreground="White" Effect="{StaticResource DropShadow}" FontSize="14" Padding="0" />
-				</Border>
-			</StackPanel>
-		</Border>
-		
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
 
-		<Border Grid.Row="2">
-			<Grid>
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="12" />
-					<ColumnDefinition Width="8" />
-					<ColumnDefinition Width="8" />
-					<ColumnDefinition Width="8" />
-					<ColumnDefinition />
-					<ColumnDefinition Width="32"/>
-				</Grid.ColumnDefinitions>
-
-				<Border Grid.Column="1" Background="#FF6000" RenderTransform="{StaticResource OWSkew}" />
-				<Border Grid.Column="2" Background="#00FF42" RenderTransform="{StaticResource OWSkew}" />
-				<Border Grid.Column="3" Grid.ColumnSpan="2" Background="#0080FF" RenderTransform="{StaticResource OWSkew}" />
-
-				<Label Grid.Column="4" Content="Plugins" Foreground="White" FontSize="16"
-						Padding="0" VerticalAlignment="Center" Effect="{StaticResource DropShadow}" />
-			</Grid>
-		</Border>
-
-		<ListView Grid.Row="3" ItemsSource="{Binding Plugins, Converter={conv:SettingsPluginMetadataConverter}}" />
-	</Grid>
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+					</TextBlock>
+				</Grid>
+			</ScrollViewer>
+		</TabItem>
+	</TabControl>
 </Window>

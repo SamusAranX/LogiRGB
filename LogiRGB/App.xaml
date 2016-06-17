@@ -19,9 +19,18 @@
 			<tb:TaskbarIcon x:Key="taskbarIcon" IconSource="Images/LogiRGB.ico" ToolTip="LogiRGB"
 							DoubleClickCommand="{StaticResource showWindowCommand}" ContextMenu="{StaticResource contextMenu}" />
 
+			<Color x:Key="Red">#FF6000</Color>
+			<Color x:Key="Green">#00FF42</Color>
+			<Color x:Key="Blue">#0080FF</Color>
+
+			<SolidColorBrush x:Key="RedBrush" Color="{StaticResource Red}" />
+			<SolidColorBrush x:Key="GreenBrush" Color="{StaticResource Green}" />
+			<SolidColorBrush x:Key="BlueBrush" Color="{StaticResource Blue}" />
+
 			<!--<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="Styles/AdobeSlider.xaml" />
 			</ResourceDictionary.MergedDictionaries>-->
 		</ResourceDictionary>
+
 	</Application.Resources>
 </Application>

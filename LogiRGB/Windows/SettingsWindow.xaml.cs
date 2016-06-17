@@ -61,7 +61,7 @@ namespace LogiRGB {
 
 			var currentColor = ((App)App.Current).colorManager.CurrentColor;
 			colorBorder.Background = new SolidColorBrush(currentColor.ToMediaColor());
-			colorLabel.Content = currentColor.ToHexString();
+			colorLabel.Text = currentColor.ToHexString();
 			exeNameLabel.Content = "Nothing yet.";
 
 			((App)Application.Current).colorManager.ColorChanged += ColorManager_ColorChanged;
@@ -77,7 +77,7 @@ namespace LogiRGB {
 			var newColor = e.NewColor;
 
 			colorBorder.Background = new SolidColorBrush(e.NewColor.ToMediaColor());
-			colorLabel.Content = e.NewColor.ToHexString();
+			colorLabel.Text = e.NewColor.ToHexString();
 		}
 
 		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
@@ -118,6 +118,10 @@ namespace LogiRGB {
 
 			Debug.WriteLine(string.Join(", ", settings.FallbackColor));
 			Debug.WriteLine(string.Join(", ", settings.HashesAndColors));
+		}
+
+		private void colorLabel_LostFocus(object sender, RoutedEventArgs e) {
+
 		}
 	}
 }
