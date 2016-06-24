@@ -42,6 +42,7 @@
 								</Grid.ColumnDefinitions>
 
 								<Border Grid.Column="3" Background="{StaticResource BlueBrush}" RenderTransform="{StaticResource OWSkew}" />
+
 								<Border Grid.Column="1" Background="{StaticResource RedBrush}" RenderTransform="{StaticResource OWSkew}" />
 								<Border Grid.Column="2" Background="{StaticResource GreenBrush}" RenderTransform="{StaticResource OWSkew}" />
 								<Border Grid.Column="3" Grid.ColumnSpan="3" Background="{StaticResource BlueBrush}" />
@@ -82,7 +83,7 @@
 		</Style>
 	</Window.Resources>
 
-	<TabControl TabStripPlacement="Left" Background="Transparent" BorderBrush="{StaticResource BlueBrush}" BorderThickness="1,0,0,0">
+	<TabControl x:Name="SettingsTabs" TabStripPlacement="Left" Background="Transparent" BorderBrush="{StaticResource BlueBrush}" BorderThickness="1,0,0,0">
 		<TabItem Header="Color Preview" IsSelected="True">
 			<Border Grid.Row="1" Margin="4" CornerRadius="4" x:Name="colorBorder">
 				<StackPanel VerticalAlignment="Center" Margin="20,0">
@@ -99,36 +100,30 @@
 				</StackPanel>
 			</Border>
 		</TabItem>
+
 		<TabItem Header="Plugins">
 			<ListView Grid.Row="3" ItemsSource="{Binding Plugins, Converter={conv:SettingsPluginMetadataConverter}}" />
 		</TabItem>
+
 		<TabItem Header="About LogiRGB">
 			<ScrollViewer VerticalScrollBarVisibility="Auto">
 				<Grid>
 					<Grid.RowDefinitions>
 						<RowDefinition Height="128" />
-						<RowDefinition Height="60" />
+						<RowDefinition Height="42" />
+						<RowDefinition Height="32"/>
 						<RowDefinition />
 					</Grid.RowDefinitions>
 
 					<Image Grid.Row="0" Source="/LogiRGB;component/Images/logirgb5_small.png" />
 
-					<Label Grid.Row="1" Content="LogiRGB" FontSize="42" FontWeight="Medium"
+					<Label Grid.Row="1" Content="LogiRGB" FontSize="30" FontWeight="Medium"
 						HorizontalContentAlignment="Center"  Padding="0" Foreground="White" />
 
-					<TextBlock Grid.Row="2" Foreground="White" Margin="40,0">
-					﻿IconExtractor/IconUtil for .NET
-Copyright (C) 2014 Tsuda Kageyu. All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions
-are met:
-
- 1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions and the following disclaimer.
- 2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions and the following disclaimer in the
-    documentation and/or other materials provided with the distribution.
+					<TextBlock Grid.Row="2" Foreground="White" Margin="40,0" FontSize="13" HorizontalAlignment="Center">
+						<Run>Made by</Run>
+						<Hyperlink Foreground="{StaticResource BlueBrush}" NavigateUri="https://peterwunder.de">Peter Wunder</Hyperlink>
+						<Run>in 2016</Run>
 					</TextBlock>
 				</Grid>
 			</ScrollViewer>
