@@ -9,6 +9,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Resources;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
@@ -35,7 +36,12 @@ namespace LogiRGB {
 		private TaskbarIcon taskbarIcon;
 		public Settings settings;
 
+		public string ActiveColorHash { get; set; }
+		public string ActiveAppName { get; set; }
+
 		private void Application_Startup(object sender, StartupEventArgs e) {
+			Debug.WriteLine($"Own PID: {Process.GetCurrentProcess().Id}");
+
 			taskbarIcon = (TaskbarIcon)FindResource("taskbarIcon");
 
 			pluginManager = new PluginManager();
@@ -44,7 +50,7 @@ namespace LogiRGB {
 			Debug.WriteLine(string.Join(", ", settings.ActivePluginGUIDs));
 
 			colorManager = new ColorManager(Helpers.ByteArrayToColor(settings.FallbackColor));
-			colorManager.InitializeSDKs();
+			colorManager.InitializePlugins();
 			//colorManager.ColorChanged += ColorManager_ColorChanged;
 
 			focusWatcher = new FocusWatcher();
@@ -54,26 +60,49 @@ namespace LogiRGB {
 			var containsInvalidGUIDs = settings.ActivePluginGUIDs.Select(ap => Tuple.Create(ap, pluginManager.Plugins.Select(p => p.Metadata.GUID).Contains(ap)));
 			if (pluginManager.Plugins.Count() == 0) {
 				// Checking if there are plugins loaded - if not, exit.
-				taskbarIcon.ShowBalloonTip("LogiRGB", "No plugins found.\nExiting.", BalloonIcon.Warning);
+				//taskbarIcon.ShowBalloonTip("LogiRGB", "No plugins found.\nExiting.", BalloonIcon.Warning);
+				var msg = "There are no valid plugins in the plugin folder.\n" +
+						  "Do you want to go to LogiRGB's plugin site?";
+				var result = MessageBox.Show(msg, "No plugins found", MessageBoxButton.YesNo, MessageBoxImage.Exclamation);
+				if (result == MessageBoxResult.Yes)
+					Process.Start(LogiRGB.Properties.Resources.PluginsURL);
+
 				App.Current.Shutdown();
 			} else if (containsInvalidGUIDs.All(x => x.Item2)) {
-				// With this insanely longuerythatdeleted LINQ q hcheckingave, wewhether there are GUIDs in ActivePluginGUIDs that are also not in the actual plugin list
-				// That way we know if there are any plugins  been're  deleted between restarts of LogiRGB	
-				// False means that the plugin has been 
+				// With this fantastic LINQ query, we check whether there are GUIDs in ActivePluginGUIDs that are also not in the actual plugin list
+				// That way we know if there are any plugins that have been deleted between restarts of LogiRGB	
+				// False means that the plugin has been deleted.
 
 				// Get a list of GUIDs of plugins that still exist
 				var newActivePluginGUIDs = settings.ActivePluginGUIDs.Where(g => containsInvalidGUIDs.Single(t => t.Item1 == g).Item2);
-
-				settings.ActivePluginGUIDs = newActivePluginGUIDs.ToArray();
+				settings.ActivePluginGUIDs = newActivePluginGUIDs.ToList();
 			}
 
-			//if(!IsAdministrator()) {
-			//	MessageBox.Show("Without administrator privileges, LogiRGB won't be able to read some applications' data.\nYou don't have to grant it these privileges, but without them, some applications will not trigger a color change.", "LogiRGB", MessageBoxButton.OK, MessageBoxImage.Information);
-			//}
+			if (settings.ActivePluginGUIDs.Count == 0) {
+				Debug.WriteLine("There are no plugins loaded.");
+			}
+		}
+
+		public void OpenSettingsWindow(int tabIndex = 0) {
+			var openWindows = this.Windows.OfType<SettingsWindow>();
+			if (openWindows.Count() != 1) {
+				SettingsWindow settingsWindow = new SettingsWindow();
+				settingsWindow.Show();
+			} else {
+				var settingsWindow = openWindows.First();
+				settingsWindow.SettingsTabs.SelectedIndex = tabIndex;
+				settingsWindow.Activate();
+			}
+		}
+
+		private void Settings_Click(object sender, RoutedEventArgs e) {
+			Debug.WriteLine("Display Settings window");
+			OpenSettingsWindow(1); // 2 = plugin settings
 		}
 
 		private void About_Click(object sender, RoutedEventArgs e) {
 			Debug.WriteLine("Display About window");
+			OpenSettingsWindow(2); // 2 = about
 		}
 
 		private void Exit_Click(object sender, RoutedEventArgs e) {
@@ -85,29 +114,29 @@ namespace LogiRGB {
 		//}
 
 		private void FocusWatcher_FocusChanged(object sender, FocusChangedEventArgs e) {
-			Debug.WriteLine(e.Filename);
-
-			if (e.Filename == Assembly.GetExecutingAssembly().Location || e.Filename.EndsWith("LogiRGB.vshost.exe"))
-				return; // Exclude LogiRGB
-
 			using (FileStream fs = File.OpenRead(e.Filename))
 			using (SHA1 sha1 = SHA1.Create()) {
 				var checksum = sha1.ComputeHash(fs);
 				var strChecksum = BitConverter.ToString(checksum).Replace("-", string.Empty).ToLowerInvariant();
+				this.ActiveColorHash = strChecksum;
+				this.ActiveAppName = e.Filename;
 
 				if (settings.HashesAndColors.ContainsKey(strChecksum)) {
 					//
 					// Dictionary entry found, using data from that
 					//
-					var colorBytes = settings.HashesAndColors[strChecksum];
-					var color = Helpers.ByteArrayToColor(colorBytes);
 
+					//var colorBytes = settings.HashesAndColors[strChecksum];
+					//var color = Helpers.ByteArrayToColor(colorBytes);
+					var colorInfo = settings.HashesAndColors[strChecksum];
+					var color = Helpers.ByteArrayToColor(colorInfo.UsesCustomColor ? colorInfo.CustomColor : colorInfo.Color);
+					
 					Debug.WriteLine("Dictionary hit! " + color.ToString());
 					
 					colorManager.SetColor(color);
 				} else {
 					//
-					// No dictionary entry found, generating color and creating entry
+					// No dictionary entry found, generating new color and creating entry
 					//
 
 					var iconBitmap = Helpers.GetEXEIconBitmap(e.Filename);
@@ -124,8 +153,9 @@ namespace LogiRGB {
 					} else {
 						newColor = colors[0];
 					}
-					
-					settings.HashesAndColors[strChecksum] = newColor.ToByteArray();
+
+					//settings.HashesAndColors[strChecksum] = newColor.ToByteArray();
+					settings.HashesAndColors[strChecksum] = new Settings.ColorInfo(newColor);
 					colorManager.SetColor(newColor);
 
 					settings.SaveSettings(); // Save settings so our newly generated colors aren't lost
@@ -134,6 +164,8 @@ namespace LogiRGB {
 		}
 
 		private void Application_Exit(object sender, ExitEventArgs e) {
+			settings.SaveSettings();
+
 			colorManager.Shutdown();
 
 			focusWatcher.StopWatching();
@@ -142,24 +174,18 @@ namespace LogiRGB {
 	}
 
 	class ShowWindowCommand : ICommand {
+#pragma warning disable 0067
+		public event EventHandler CanExecuteChanged;
+#pragma warning restore 0067
+
 		public void Execute(object parameter) {
 			Debug.WriteLine("Double Click");
 
-			var openWindows = Application.Current.Windows.OfType<SettingsWindow>();
-			if (openWindows.Count() != 1) {
-				SettingsWindow settingsWindow = new SettingsWindow();
-				settingsWindow.Show();
-			} else {
-				var settingsWindow = openWindows.First();
-				//settingsWindow.Focus();
-				settingsWindow.Activate();
-			}
+			((App)App.Current).OpenSettingsWindow(0); // 0 = color preview
 		}
 
 		public bool CanExecute(object parameter) {
 			return true;
 		}
-
-		public event EventHandler CanExecuteChanged;
 	}
 }

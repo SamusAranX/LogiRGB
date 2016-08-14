@@ -21,13 +21,19 @@ using MColor = System.Windows.Media.Color;
 
 namespace LogiRGB {
 	public static class Helpers {
-		
 
 		// Gets the biggest icon of an .exe file
 		public static Bitmap GetEXEIconBitmap(string path) {
 			IconExtractor ie = new IconExtractor(path);
 			if (ie.Count > 0) {
-				Icon bigIcon = IconUtil.Split(ie.GetIcon(0)).OrderByDescending(i => IconUtil.ToBitmap(i).PhysicalDimension.Width).First();
+				Icon bigIcon = IconUtil.Split(ie.GetIcon(0)).OrderByDescending(i => {
+					try {
+						return IconUtil.ToBitmap(i).PhysicalDimension.Width;
+					} catch (ArgumentException) {
+						return 1;
+					}
+				}).First();
+				
 				return IconUtil.ToBitmap(bigIcon);
 			} else {
 				Debug.WriteLine("ExtractAssociatedIcon");

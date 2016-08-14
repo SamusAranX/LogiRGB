@@ -9,11 +9,12 @@ using System.Windows.Data;
 using PluginContracts;
 
 namespace LogiRGB.Converters {
-	class SettingsPluginMetadataConverter : BaseConverter, IValueConverter {
+	class SettingsPluginGUIDIsSelectedConverter : BaseConverter, IValueConverter {
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
-			var lazyPlugins = (IEnumerable<Lazy<IPlugin, IPluginMetadata>>)value;
+			var pluginMetadata = (IPluginMetadata)value;
+			var activePlugins = ((App)App.Current).settings.ActivePluginGUIDs;
 
-			return lazyPlugins.Select(lp => lp.Metadata.Name);
+			return activePlugins.Contains(pluginMetadata.GUID);
 		}
 
 		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {

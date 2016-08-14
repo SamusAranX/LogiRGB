@@ -41,7 +41,24 @@ namespace LogiRGB.Managers {
 				.Where(p => activePluginGUIDs.Contains(new Guid(p.Metadata.GUID)));
 		}
 
-		public void InitializeSDKs() {
+		private void ErrorHandler(Lazy<IPlugin, IPluginMetadata> lazyPlugin, Exception ex) {
+			try {
+				Debug.WriteLine($"Plugin \"{lazyPlugin.Metadata.Name}\" couldn't be loaded. (Exception)");
+				Debug.WriteLine($"Exception Details: {ex.Message}");
+
+				((App)App.Current).settings.ActivePluginGUIDs.Remove(lazyPlugin.Metadata.GUID);
+
+				MessageBox.Show($"Plugin \"{lazyPlugin.Metadata.Name}\" has crashed. " +
+					"It has been disabled to prevent more crashes.\n" +
+					"The following info might help the developer fix the crash:\n" +
+					$"{ex.Message}\n{ex.StackTrace}", "LogiRGB: Plugin crashed", MessageBoxButton.OK, MessageBoxImage.Error);
+			} catch (Exception) {
+				Debug.WriteLine("The error handler has crashed. All hope is lost.");
+				throw;
+			}
+		}
+
+		public void InitializePlugins() {
 			var plugins = GetActivePlugins();
 			Debug.WriteLine(plugins.Count());
 
@@ -56,9 +73,18 @@ namespace LogiRGB.Managers {
 					if (!plugin.Initialize()) {
 						Debug.WriteLine($"Plugin \"{lazyPlugin.Metadata.Name}\" couldn't be loaded. (Initialize)");
 					}
-				} catch (Exception) {
-					Debug.WriteLine($"Plugin \"{lazyPlugin.Metadata.Name}\" couldn't be loaded. (Exception)");
-					throw;
+				} catch (Exception ex) {
+					ErrorHandler(lazyPlugin, ex);
+
+					//Debug.WriteLine($"Plugin \"{lazyPlugin.Metadata.Name}\" couldn't be loaded. (Exception)");
+					//Debug.WriteLine($"Exception Details: {ex.Message}");
+
+					//((App)App.Current).settings.ActivePluginGUIDs.Remove(lazyPlugin.Metadata.GUID);
+
+					//MessageBox.Show($"Plugin \"{lazyPlugin.Metadata.Name}\" has crashed. " + 
+					//	"It has been disabled to prevent more crashes.\n" + 
+					//	"The following info might help the developer fix the crash:\n" + 
+					//	$"{ex.Message}\n{ex.StackTrace}", "LogiRGB: Plugin crashed", MessageBoxButton.OK, MessageBoxImage.Error);
 				}
 			}
 		}
@@ -73,9 +99,10 @@ namespace LogiRGB.Managers {
 				var plugin = lazyPlugin.Value;
 				try {
 					plugin.Shutdown();
-				} catch (Exception) {
-					Debug.WriteLine($"Plugin \"{lazyPlugin.Metadata.Name}\" couldn't be shut down. (Exception)");
-					throw;
+				} catch (Exception ex) {
+					ErrorHandler(lazyPlugin, ex);
+					//Debug.WriteLine($"Plugin \"{lazyPlugin.Metadata.Name}\" couldn't be shut down. (Exception)");
+					//throw;
 				}
 			}
 		}
@@ -87,11 +114,12 @@ namespace LogiRGB.Managers {
 				var plugin = lazyPlugin.Value;
 				try {
 					if (!plugin.SetColor(newColor)) {
-						Debug.WriteLine($"Plugin \"{lazyPlugin.Metadata.Name}\" failed when setting color. (Initialize)");
+						Debug.WriteLine($"Plugin \"{lazyPlugin.Metadata.Name}\" failed when setting color. (SetColor)");
 					}
-				} catch (Exception) {
-					Debug.WriteLine($"Plugin \"{lazyPlugin.Metadata.Name}\" failed when setting color. (Exception)");
-					throw;
+				} catch (Exception ex) {
+					ErrorHandler(lazyPlugin, ex);
+					//Debug.WriteLine($"Plugin \"{lazyPlugin.Metadata.Name}\" failed when setting color. (Exception)");
+					//throw;
 				}
 			}
 

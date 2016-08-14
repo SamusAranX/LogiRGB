@@ -8,11 +8,6 @@ using System.ComponentModel.Composition;
 
 namespace PluginContracts {
 	public interface IPlugin {
-		string Description { get; }
-
-		string UpdateURL { get; }
-		string Website { get; }
-
 		bool Initialize();
 		void Shutdown();
 		
@@ -21,11 +16,12 @@ namespace PluginContracts {
 
 	public interface IPluginMetadata {
 		string Name { get; }
+		string Description { get; }
 		string Author { get; }
 		string Version { get; }
+		string UpdateURL { get; }
+		string Website { get; }
 
 		string GUID { get; }
 	}
-
-
 }

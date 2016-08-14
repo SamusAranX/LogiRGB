@@ -4,13 +4,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LogiRGB.Windows"
-        mc:Ignorable="d"
+        mc:Ignorable="d" Background="{StaticResource HatchBrush}"
         Title="FirstStartWindow" Height="380" Width="512">
 	<Window.Resources>
-		<DropShadowEffect x:Key="DropShadow" ShadowDepth="1" BlurRadius="4" Direction="270" RenderingBias="Quality"/>
-		<SkewTransform x:Key="OWSkew" AngleX="-15" />
 	</Window.Resources>
-	<Grid>
+	<Grid Background="{StaticResource OverlayBrush}">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="10" />
 			<RowDefinition Height="50" />
@@ -23,23 +21,26 @@
 					<ColumnDefinition Width="24" />
 					<ColumnDefinition Width="12" />
 					<ColumnDefinition Width="12" />
-					<ColumnDefinition Width="12" />
 					<ColumnDefinition />
-					<ColumnDefinition Width="32"/>
+					<ColumnDefinition Width="12"/>
 				</Grid.ColumnDefinitions>
 
 				<Border Grid.Column="1" Background="#FF6000" RenderTransform="{StaticResource OWSkew}" />
 				<Border Grid.Column="2" Background="#00FF42" RenderTransform="{StaticResource OWSkew}" />
-				<Border Grid.Column="3" Grid.ColumnSpan="2" Background="#0080FF" RenderTransform="{StaticResource OWSkew}" />
+				<Border Grid.Column="3" Background="#0080FF" RenderTransform="{StaticResource OWSkew}" />
 
-				<Label Grid.Column="3" Grid.ColumnSpan="2" Content="Thanks for downloading LogiRGB!" Foreground="White" FontSize="26"
-						Padding="6,0,0,0" VerticalAlignment="Center" Effect="{StaticResource DropShadow}" FontStyle="Italic" />
+				<Label Grid.Column="3" Content="Thanks for downloading LogiRGB!"
+				Foreground="White" FontSize="26" Padding="0,0,24,0" VerticalAlignment="Center" HorizontalAlignment="Center"
+				Effect="{StaticResource DropShadow}" FontStyle="Italic" />
 			</Grid>
 		</Border>
 
-		<Grid Grid.Row="2">
+		<Grid Grid.Row="5" Margin="12,0">
 			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="256" />
+				<ColumnDefinition />
+				<ColumnDefinition Width="1" />
+				<ColumnDefinition />
+				<ColumnDefinition Width="1" />
 				<ColumnDefinition />
 			</Grid.ColumnDefinitions>
 

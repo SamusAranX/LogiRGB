@@ -11,26 +11,10 @@ namespace LogitechGSDK_Plugin {
 	[ExportMetadata("Author", "Peter Wunder")]
 	[ExportMetadata("Version", "1.0")]
 	[ExportMetadata("GUID", "C8CF0EAB-2BB0-4BCB-8122-560281515295")]
+	[ExportMetadata("Description", "This plugin provides color changing capability for all Logitech devices supported by their LED Illumination SDK.\nBasically, if your device has RGB LEDs inside of it, chances are this will support it.")]
+	[ExportMetadata("UpdateURL", "https://apps.peterwunder.de/logirgb/pluginLogiUpdate.json")]
+	[ExportMetadata("Website", "https://peterwunder.de")]
 	public class LogitechPlugin : IPlugin {
-
-		public string Description {
-			get {
-				return "This plugin provides color changing capability for all Logitech devices supported by their LED Illumination SDK.\nBasically, if your device has RGB LEDs inside of it, chances are this will support it.";
-			}
-		}
-
-		public string UpdateURL {
-			get {
-				return "https://apps.peterwunder.de/logirgb/pluginLogiUpdate.json";
-			}
-		}
-
-		public string Website {
-			get {
-				return "https://peterwunder.de";
-			}
-		}
-
 		public bool Initialize() {
 			Debug.WriteLine(this.GetType().Name + ": Initialize");
 
@@ -43,6 +27,8 @@ namespace LogitechGSDK_Plugin {
 			return true;
 		}
 
+		// This will always return false after doing Init() -> ... -> Shutdown() -> Init() again -> SetColor()
+		// So basically, after disabling and re-enabling this plugin in the settings
 		public bool SetColor(Color c) {
 			var col = c.MoreIntenseColor();
 

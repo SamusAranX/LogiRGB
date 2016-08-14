@@ -77,9 +77,11 @@
     <Reference Include="nQuant.Core">
       <HintPath>..\..\..\..\Downloads\nQuant-1.0.3\net40\nQuant.Core.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationFramework.Aero2" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml" />
@@ -111,8 +113,13 @@
     <Compile Include="Settings.cs" />
     <Compile Include="Managers\UpdateManager.cs" />
     <Compile Include="Value Converters\BaseConverter.cs" />
-    <Compile Include="Value Converters\SettingsPluginMetadataConverter.cs" />
+    <Compile Include="Value Converters\SettingsPluginGUIDIsSelectedConverter.cs" />
+    <Compile Include="Value Converters\SettingsPluginNameDescDisplayConverter.cs" />
     <Compile Include="WinAPI.cs" />
+    <Page Include="Styles\ModernGridViewHeaderTemplate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\FirstStartWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -3,14 +3,24 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace LogiRGB.Managers {
+	/// <summary>
+	/// Waits for window focus changes and notifies all event subscribers
+	/// Excludes the 
+	/// </summary>
 	public class FocusWatcher {
 
 		WinApi.WinEventDelegate dele = null;
 		IntPtr eventHook;
+
+		// "System Idle Process" and "System" processes
+		// When quickly minimizing and restoring windows from the taskbar, Windows sometimes brings these into focus
+		// So we'll filter those out to avoid crashes
+		uint[] forbiddenProcIDs = { 0, 4, 8 };
 
 		public FocusWatcher() {
 			dele = new WinApi.WinEventDelegate(WinEventProc);
@@ -30,6 +40,10 @@ namespace LogiRGB.Managers {
 
 			uint processID;
 			WinApi.GetWindowThreadProcessId(windowHandle, out processID);
+			Debug.WriteLine($"Process ID: {processID}");
+
+			if (forbiddenProcIDs.Contains(processID))
+				return;
 
 			try {
 				string filename = Process.GetProcessById((int)processID).MainModule.FileName;
@@ -44,6 +58,11 @@ namespace LogiRGB.Managers {
 			var handler = FocusChanged;
 			if (handler == null)
 				return;
+
+			Debug.WriteLine($"FocusWatcher: {filename}");
+
+			if (filename == Assembly.GetExecutingAssembly().Location || filename.EndsWith("LogiRGB.vshost.exe"))
+				return; // Exclude LogiRGB
 
 			var eventArgs = new FocusChangedEventArgs(processID, windowHandle, filename);
 			handler(this, eventArgs);

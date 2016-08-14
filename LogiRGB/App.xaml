@@ -2,16 +2,20 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			 xmlns:tb="http://www.hardcodet.net/taskbar"
-			 xmlns:my="clr-namespace:LogiRGB"
              xmlns:local="clr-namespace:LogiRGB"
 			 ShutdownMode="OnExplicitShutdown"
 			 Startup="Application_Startup" Exit="Application_Exit">
 
 	<Application.Resources>
 		<ResourceDictionary>
-			<my:ShowWindowCommand x:Key="showWindowCommand" />
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="Styles/ModernGridViewHeaderTemplate.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+			<local:ShowWindowCommand x:Key="showWindowCommand" />
 
 			<ContextMenu x:Key="contextMenu">
+				<MenuItem Click="Settings_Click" Header="Plugin Settings" />
+				<Separator />
 				<MenuItem Click="About_Click" Header="About LogiRGB" />
 				<MenuItem Click="Exit_Click" Header="Exit" />
 			</ContextMenu>
@@ -23,9 +27,36 @@
 			<Color x:Key="Green">#00FF42</Color>
 			<Color x:Key="Blue">#0080FF</Color>
 
+			<Color x:Key="Red75">#C0FF6000</Color>
+			<Color x:Key="Green75">#C000FF42</Color>
+			<Color x:Key="Blue75">#C00080FF</Color>
+
+			<Color x:Key="RedTransparent">#00FF6000</Color>
+			<Color x:Key="GreenTransparent">#0000FF42</Color>
+			<Color x:Key="BlueTransparent">#000080FF</Color>
+
 			<SolidColorBrush x:Key="RedBrush" Color="{StaticResource Red}" />
 			<SolidColorBrush x:Key="GreenBrush" Color="{StaticResource Green}" />
 			<SolidColorBrush x:Key="BlueBrush" Color="{StaticResource Blue}" />
+
+			<SolidColorBrush x:Key="Red75Brush" Color="{StaticResource Red75}" />
+			<SolidColorBrush x:Key="Green75Brush" Color="{StaticResource Green75}" />
+			<SolidColorBrush x:Key="Blue75Brush" Color="{StaticResource Blue75}" />
+
+			<DropShadowEffect x:Key="DropShadow" ShadowDepth="1" BlurRadius="4" Direction="270" RenderingBias="Quality"/>
+			<SkewTransform x:Key="OWSkew" AngleX="-15" />
+
+			<LinearGradientBrush x:Key="HatchBrush" MappingMode="Absolute" StartPoint="0,0" EndPoint="2,2" SpreadMethod="Repeat">
+				<GradientStop Offset="0" Color="#202020"/>
+				<GradientStop Offset="0.5" Color="#202020"/>
+				<GradientStop Offset="0.5" Color="#282E33"/>
+				<GradientStop Offset="1" Color="#282E33"/>
+			</LinearGradientBrush>
+
+			<LinearGradientBrush x:Key="OverlayBrush" StartPoint="0,0" EndPoint="0,1">
+				<GradientStop Offset="0" Color="#22FFFFFF"/>
+				<GradientStop Offset="1" Color="#00FFFFFF"/>
+			</LinearGradientBrush>
 
 			<!--<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="Styles/AdobeSlider.xaml" />

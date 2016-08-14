@@ -13,28 +13,10 @@ namespace WinAero_Plugin {
 	[ExportMetadata("Author", "Peter Wunder")]
 	[ExportMetadata("Version", "1.0")]
 	[ExportMetadata("GUID", "B45CC307-02B2-4AE7-B415-DAE17EB1CB7B")]
+	[ExportMetadata("Description", "This plugin enables LogiRGB to change your system's Aero color.\nWindows 7+ and enabled Aero themes required.")]
+	[ExportMetadata("UpdateURL", "https://apps.peterwunder.de/logirgb/pluginAeroUpdate.json")]
+	[ExportMetadata("Website", "https://peterwunder.de")]
 	public class AeroPlugin : IPlugin {
-
-		#region IPlugin Properties
-		public string Description {
-			get {
-				return "This plugin enabled LogiRGB to change your system's Aero color.\nWindows 7+ and enabled Aero themes required";
-			}
-		}
-
-		public string UpdateURL {
-			get {
-				return "https://apps.peterwunder.de/logirgb/pluginAeroUpdate.json";
-			}
-		}
-
-		public string Website {
-			get {
-				return "https://peterwunder.de";
-			}
-		}
-		#endregion
-
 		#region Windows Aero APIs
 		public struct DWM_COLORIZATION_PARAMS {
 			public uint clrColor;

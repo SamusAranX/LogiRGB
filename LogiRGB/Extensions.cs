@@ -48,6 +48,11 @@ namespace LogiRGB {
 			return MColor.FromArgb(color.A, color.R, color.G, color.B);
 		}
 
+		// Converts a GDI+ Color object to a WPF Color object
+		public static DColor ToDrawingColor(this MColor color) {
+			return DColor.FromArgb(color.A, color.R, color.G, color.B);
+		}
+
 		public static T[] SubArray<T>(this T[] data, int index, int length) {
 			T[] result = new T[length];
 			Array.Copy(data, index, result, 0, length);
@@ -85,36 +90,6 @@ namespace LogiRGB {
 			for (int i = arr.Count(); i < arr.Length; i++) {
 				arr[i] = value;
 			}
-		}
-
-		public static DColor MoreIntenseColor(this DColor col) {
-			//Debug.WriteLine("MoreIntenseColor: " + col.ToString());
-
-			var hue = col.GetHue();
-			var sat = col.GetSaturation();
-			var bri = col.GetBrightness();
-			//Debug.WriteLine($"MoreIntenseColor: {hue}-{sat}-{bri}");
-
-			// If color is already pretty intense, don't modify it any further
-			if ((sat >= 0.5f && sat <= 0.9f) && (bri >= 0.5f && bri <= 0.6f))
-				return col;
-
-			// If color doesn't look intense, make it more intense
-			if (sat < 0.5f)
-				sat = 0.5f;
-			if (sat > 0.8f)
-				sat = 0.9f;
-
-			if (bri < 0.5f)
-				bri = 0.5f;
-			if (bri > 0.65f)
-				bri = 0.6f;
-			
-			//Debug.WriteLine($"MoreIntenseColor: {hue}-{sat}-{bri}");
-			var moreIntenseColor = Helpers.ColorFromAHSB(255, hue, sat, bri);
-			//Debug.WriteLine("MoreIntenseColor: " + moreIntenseColor.ToString());
-
-			return moreIntenseColor;
 		}
 
 	}

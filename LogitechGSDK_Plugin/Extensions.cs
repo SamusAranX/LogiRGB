@@ -18,19 +18,17 @@ namespace LogitechGSDK_Plugin {
 			//Debug.WriteLine($"MoreIntenseColor: {hue}-{sat}-{bri}");
 
 			// If color is already pretty intense, don't modify it any further
-			if ((sat >= 0.5f && sat <= 0.9f) && (bri >= 0.5f && bri <= 0.6f))
+			if ((sat >= 0.65f && sat <= 1.0f) && (bri >= 0.35f || bri <= 0.65f))
 				return col;
 
 			// If color doesn't look intense, make it more intense
-			if (sat < 0.5f)
-				sat = 0.5f;
-			if (sat > 0.8f)
-				sat = 0.9f;
+			//if (sat < 0.5f)
+			//	sat = 0.5f;
+			if (sat < 0.8f)
+				sat = 0.95f;
 
-			if (bri < 0.5f)
+			if (bri < 0.35f || bri > 0.65f)
 				bri = 0.5f;
-			if (bri > 0.65f)
-				bri = 0.6f;
 
 			//Debug.WriteLine($"MoreIntenseColor: {hue}-{sat}-{bri}");
 			var moreIntenseColor = Helpers.ColorFromAHSB(255, hue, sat, bri);

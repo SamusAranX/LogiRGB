@@ -5,26 +5,164 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LogiRGB"
 		xmlns:conv="clr-namespace:LogiRGB.Converters"
-		UseLayoutRounding="True"
+		UseLayoutRounding="True" SourceInitialized="Window_SourceInitialized"
         mc:Ignorable="d" Loaded="Window_Loaded" Closing="Window_Closing" Topmost="True"
-        Title="LogiRGB Settings" Icon="../Images/LogiRGB.ico" Height="240" Width="420">
-	<Window.Background>
-		<RadialGradientBrush GradientOrigin="0.5,0" RadiusX="1.25" RadiusY="0.55" Center="0.5,0.5">
-			<GradientStop Color="#3C3B3D" Offset="0" />
-			<GradientStop Color="#1B1B1C" Offset="1" />
-		</RadialGradientBrush>
-	</Window.Background>
+        Title="LogiRGB Settings" Icon="../Images/LogiRGB.ico" Typography.ContextualLigatures="True"
+		Height="250" Width="512" ResizeMode="CanMinimize" Background="{StaticResource HatchBrush}">
 	<Window.Resources>
-		<DropShadowEffect x:Key="DropShadow" ShadowDepth="1" BlurRadius="4" Direction="270" RenderingBias="Quality"/>
-		<SkewTransform x:Key="OWSkew" AngleX="-15" />
-
 		<CubicEase x:Key="TranslateEase" EasingMode="EaseOut" />
 
+		<LinearGradientBrush x:Key="BlueGradient" MappingMode="Absolute" StartPoint="0,0" EndPoint="4,0" ColorInterpolationMode="ScRgbLinearInterpolation">
+			<GradientStop Offset="0" Color="{StaticResource Blue}" />
+			<GradientStop Offset="1" Color="{StaticResource BlueTransparent}" />
+		</LinearGradientBrush>
+
+		<!--This is necessary to remove the shitty border on hover-->
 		<ControlTemplate TargetType="{x:Type TextBox}" x:Key="shitThatIsStillNecessaryBecauseTheWPFTeamIsABunchOfMorons">
 			<ScrollViewer Name="PART_ContentHost" />
 		</ControlTemplate>
 
-		<Style TargetType="TabItem">
+		<Style x:Key="RGBButton" TargetType="Button">
+			<Setter Property="Background" Value="Transparent" />
+			<Setter Property="BorderBrush" Value="Transparent" />
+			<Setter Property="Foreground" Value="White" />
+			<Setter Property="FontSize" Value="16" />
+			<Setter Property="FontStyle" Value="Italic" />
+			<Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
+
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="{x:Type Button}">
+						<Grid RenderTransformOrigin="{TemplateBinding RenderTransformOrigin}">
+							<Grid.RenderTransform>
+								<ScaleTransform x:Name="RGB_Button_Scale" />
+							</Grid.RenderTransform>
+							<Grid x:Name="RGB_BG" Background="{StaticResource BlueBrush}" ClipToBounds="True" RenderTransform="{StaticResource OWSkew}" RenderTransformOrigin="{TemplateBinding RenderTransformOrigin}">
+								<Border x:Name="RGB_Red_Bar" Background="{StaticResource RedBrush}" Width="0" HorizontalAlignment="Left" />
+
+								<Grid x:Name="RGB_Slider">
+									<Grid.RenderTransform>
+										<!-- -49, +49  -->
+										<TranslateTransform x:Name="RGB_Slider_Translate" X="-49" />
+									</Grid.RenderTransform>
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition />
+										<ColumnDefinition Width="8" />
+										<ColumnDefinition />
+									</Grid.ColumnDefinitions>
+
+									<Border Grid.Column="0" Background="{StaticResource RedBrush}" />
+									<Border Grid.Column="1" Background="{StaticResource GreenBrush}" />
+									<Border Grid.Column="2" Background="{StaticResource BlueBrush}" />
+								</Grid>
+							</Grid>
+
+							<ContentPresenter x:Name="MyContentPresenter" Content="{TemplateBinding Content}" Effect="{StaticResource DropShadow}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" />
+						</Grid>
+
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsMouseOver" Value="True">
+								<Setter Property="Background" Value="{StaticResource RedBrush}" />
+
+								<Trigger.EnterActions>
+									<BeginStoryboard>
+										<Storyboard>
+											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+											  Storyboard.TargetProperty="Width" To="122"
+											  Storyboard.TargetName="RGB_Red_Bar" Duration="0:0:0.33" />
+
+											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+											  Storyboard.TargetProperty="(TranslateTransform.X)" To="49" 
+											  Storyboard.TargetName="RGB_Slider_Translate" Duration="0:0:0.33" />
+										</Storyboard>
+									</BeginStoryboard>
+								</Trigger.EnterActions>
+								<Trigger.ExitActions>
+									<BeginStoryboard>
+										<Storyboard>
+											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+											  Storyboard.TargetProperty="Width" To="0"
+											  Storyboard.TargetName="RGB_Red_Bar" Duration="0:0:0.33" />
+
+											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+											  Storyboard.TargetProperty="(TranslateTransform.X)" To="-49" 
+											  Storyboard.TargetName="RGB_Slider_Translate" Duration="0:0:0.33" />
+										</Storyboard>
+									</BeginStoryboard>
+								</Trigger.ExitActions>
+							</Trigger>
+
+							<Trigger Property="IsMouseOver" Value="False">
+								<Setter Property="Background" Value="{StaticResource BlueBrush}" />
+							</Trigger>
+
+							<Trigger Property="IsPressed" Value="True">
+								<Trigger.EnterActions>
+									<BeginStoryboard>
+										<Storyboard>
+											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+											  Storyboard.TargetProperty="(ScaleTransform.ScaleX)" To="0.95" 
+											  Storyboard.TargetName="RGB_Button_Scale" Duration="0:0:0.16" />
+											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+											  Storyboard.TargetProperty="(ScaleTransform.ScaleY)" To="0.95" 
+											  Storyboard.TargetName="RGB_Button_Scale" Duration="0:0:0.16" />
+										</Storyboard>
+									</BeginStoryboard>
+								</Trigger.EnterActions>
+								<Trigger.ExitActions>
+									<BeginStoryboard>
+										<Storyboard>
+											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+											  Storyboard.TargetProperty="(ScaleTransform.ScaleX)" To="1" 
+											  Storyboard.TargetName="RGB_Button_Scale" Duration="0:0:0.16" />
+											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+											  Storyboard.TargetProperty="(ScaleTransform.ScaleY)" To="1" 
+											  Storyboard.TargetName="RGB_Button_Scale" Duration="0:0:0.16" />
+										</Storyboard>
+									</BeginStoryboard>
+								</Trigger.ExitActions>
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style x:Key="RoundedButton" TargetType="Button">
+			<Setter Property="Foreground" Value="White" />
+			<Setter Property="FontSize" Value="14" />
+
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="{x:Type Button}">
+						<Grid>
+							<Border x:Name="Button_BG"
+								Background="#55000000" BorderBrush="White"
+								BorderThickness="1" CornerRadius="5"
+								Padding="4,2" MinWidth="50">
+								<ContentPresenter x:Name="MyContentPresenter" Effect="{StaticResource DropShadow}" Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+							</Border>
+						</Grid>
+
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsMouseOver" Value="True">
+								<Setter Property="Background" TargetName="Button_BG" Value="#44000000" />
+							</Trigger>
+
+							<Trigger Property="IsMouseOver" Value="False">
+								<Setter Property="Background" TargetName="Button_BG" Value="#55000000" />
+							</Trigger>
+
+							<Trigger Property="IsPressed" Value="True">
+								<Setter Property="Background" TargetName="Button_BG" Value="#66000000" />
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style x:Key="RGBTabItem" TargetType="TabItem">
 			<Setter Property="Padding" Value="0" />
 			<Setter Property="Template">
 				<Setter.Value>
@@ -49,7 +187,7 @@
 							</Grid>
 
 							<Label Content="{TemplateBinding Header}" Effect="{StaticResource DropShadow}" 
-							VerticalContentAlignment="Center" HorizontalContentAlignment="Right"
+							VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center"
 							FontSize="16" FontStyle="Italic" Foreground="White" Margin="4,0" />
 
 							<ContentPresenter x:Name="ContentSite" ContentSource="Header" Visibility="Hidden"
@@ -81,52 +219,217 @@
 				</Setter.Value>
 			</Setter>
 		</Style>
+
+		<Style x:Key="ModernListViewItem" TargetType="{x:Type ListViewItem}">
+			<Setter Property="Background" Value="Transparent" />
+			<Setter Property="Height" Value="20" />
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="{x:Type ListViewItem}">
+						<Border BorderBrush="Transparent" BorderThickness="0" Background="{TemplateBinding Background}">
+							<GridViewRowPresenter HorizontalAlignment="Stretch" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Width="Auto" Margin="0" Content="{TemplateBinding Content}"/>
+						</Border>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+			<Style.Triggers>
+				<Trigger Property="IsSelected" Value="True">
+					<Setter Property="Background" Value="#3399FF" />
+					<Setter Property="Foreground" Value="White" />
+				</Trigger>
+				<MultiTrigger>
+					<MultiTrigger.Conditions>
+						<Condition Property="IsSelected" Value="True" />
+						<Condition Property="Selector.IsSelectionActive" Value="False" />
+					</MultiTrigger.Conditions>
+					<Setter Property="Background" Value="#F0F0F0" />
+					<Setter Property="Foreground" Value="Black" />
+				</MultiTrigger>
+			</Style.Triggers>
+		</Style>
+
+		<Style x:Key="PrettyHyperlink" TargetType="Hyperlink">
+			<Setter Property="Foreground" Value="{StaticResource BlueBrush}"/>
+			<Setter Property="TextDecorations" Value="Underline"/>
+			<Style.Triggers>
+				<Trigger Property="IsMouseOver" Value="True">
+					<Setter Property="Foreground" Value="{StaticResource Blue75Brush}"/>
+				</Trigger>
+				<DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListViewItem}}" Value="True">
+					<Setter Property="Foreground" Value="White" />
+				</DataTrigger>
+
+				<DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListViewItem}}" Value="True">
+					<Setter Property="Foreground" Value="White" />
+				</DataTrigger>
+				<MultiDataTrigger>
+					<MultiDataTrigger.Conditions>
+						<Condition Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListViewItem}}" Value="True" />
+						<Condition Binding="{Binding Path=(Selector.IsSelectionActive), RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListViewItem}}" Value="False" />
+					</MultiDataTrigger.Conditions>
+					<Setter Property="Foreground" Value="{StaticResource BlueBrush}" />
+				</MultiDataTrigger>
+				<EventTrigger RoutedEvent="Hyperlink.MouseDown">
+					<BeginStoryboard>
+						<Storyboard>
+							<ColorAnimationUsingKeyFrames Duration="0" Storyboard.TargetProperty="Foreground.Color">
+								<DiscreteColorKeyFrame KeyTime="0" Value="Red" />
+							</ColorAnimationUsingKeyFrames>
+						</Storyboard>
+					</BeginStoryboard>
+				</EventTrigger>
+			</Style.Triggers>
+		</Style>
 	</Window.Resources>
 
-	<TabControl x:Name="SettingsTabs" TabStripPlacement="Left" Background="Transparent" BorderBrush="{StaticResource BlueBrush}" BorderThickness="1,0,0,0">
-		<TabItem Header="Color Preview" IsSelected="True">
-			<Border Grid.Row="1" Margin="4" CornerRadius="4" x:Name="colorBorder">
-				<StackPanel VerticalAlignment="Center" Margin="20,0">
-					<TextBox Template="{StaticResource shitThatIsStillNecessaryBecauseTheWPFTeamIsABunchOfMorons}" 
-						x:Name="colorLabel" Text="#FFFFFF" MaxLength="7"
-						Background="Transparent" BorderBrush="Transparent" Foreground="White"
-						HorizontalAlignment="Center" Effect="{StaticResource DropShadow}" 
-						FontSize="26" FontWeight="DemiBold" Padding="0"
-						LostFocus="colorLabel_LostFocus" IsReadOnly="True" />
+	<Grid Background="{StaticResource OverlayBrush}">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="142" />
+			<ColumnDefinition />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition />
+			<RowDefinition Height="84" />
+		</Grid.RowDefinitions>
 
-					<Border Background="#55000000" CornerRadius="5" Padding="4,2" HorizontalAlignment="Center">
-						<Label Content="#FFFFFF" x:Name="exeNameLabel" Foreground="White" Effect="{StaticResource DropShadow}" FontSize="14" Padding="0" />
-					</Border>
-				</StackPanel>
-			</Border>
-		</TabItem>
+		<TabControl Grid.ColumnSpan="2" Grid.RowSpan="2" x:Name="SettingsTabs" TabStripPlacement="Left" Background="Transparent" BorderBrush="{StaticResource BlueGradient}" BorderThickness="4,0,0,0">
+			<TabItem Style="{StaticResource RGBTabItem}" Header="Color Preview" IsSelected="True">
+				<Border Grid.Row="1" Margin="4" CornerRadius="4" x:Name="colorBorder">
+					<Grid>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="50" />
+							<RowDefinition  />
+							<RowDefinition Height="50" />
+						</Grid.RowDefinitions>
 
-		<TabItem Header="Plugins">
-			<ListView Grid.Row="3" ItemsSource="{Binding Plugins, Converter={conv:SettingsPluginMetadataConverter}}" />
-		</TabItem>
+						<StackPanel Grid.Row="1" VerticalAlignment="Center" Margin="20,0">
+							<TextBox Template="{StaticResource shitThatIsStillNecessaryBecauseTheWPFTeamIsABunchOfMorons}" 
+								x:Name="colorLabel" MaxLength="7"
+								Text="#FFFFFF"
+								Background="{Binding Background, ElementName=colorBorder}" Foreground="White"
+								BorderBrush="Transparent"
+								HorizontalAlignment="Center" Effect="{StaticResource DropShadow}" 
+								FontSize="26" FontWeight="DemiBold" Padding="0"
+								IsReadOnly="False" 
+								KeyDown="colorLabel_KeyDown" />
 
-		<TabItem Header="About LogiRGB">
-			<ScrollViewer VerticalScrollBarVisibility="Auto">
+							<Border Background="#55000000" CornerRadius="5" Padding="4,2" HorizontalAlignment="Center">
+								<Label Content="example.exe" x:Name="exeNameLabel" Foreground="White" Effect="{StaticResource DropShadow}" FontSize="14" Padding="0" />
+							</Border>
+						</StackPanel>
+
+						<Button Grid.Row="2" Style="{StaticResource RoundedButton}" Visibility="{Binding CustomColorVisibility}"
+						Click="Reset_Click" Content="Reset" HorizontalAlignment="Center" VerticalAlignment="Center" />
+					</Grid>
+				</Border>
+			</TabItem>
+
+			<TabItem Style="{StaticResource RGBTabItem}" Header="Plugins">
+				<Border Margin="4" CornerRadius="4" ClipToBounds="True">
+					<ListView x:Name="lvPlugins" Grid.Row="3" Margin="-4,-2,-4,0" ItemsSource="{Binding Plugins}" 
+					ItemContainerStyle="{StaticResource ModernListViewItem}" Foreground="Black">
+						<ListView.Resources>
+							<Style TargetType="TextBlock">
+								<Setter Property="TextTrimming" Value="CharacterEllipsis" />
+								<Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=Text }" />
+							</Style>
+						</ListView.Resources>
+						<ListView.View>
+							<GridView ColumnHeaderContainerStyle="{StaticResource ModernGridViewHeader}">
+								<GridView.Columns>
+									<GridViewColumn Width="32">
+										<GridViewColumn.CellTemplate>
+											<DataTemplate>
+												<!-- WPF won't let me use a property as a converter parameter. It's garbage like that. -->
+												<CheckBox Tag="{Binding Metadata.GUID}" 
+													IsChecked="{Binding Metadata, Mode=OneWay, Converter={conv:SettingsPluginGUIDIsSelectedConverter}}" 
+													Checked="PluginCheckBox_Toggled" Unchecked="PluginCheckBox_Toggled" HorizontalAlignment="Center" />
+											</DataTemplate>
+										</GridViewColumn.CellTemplate>
+									</GridViewColumn>
+
+									<GridViewColumn Header="Name" Width="154">
+										<GridViewColumn.CellTemplate>
+											<DataTemplate>
+												<TextBlock ToolTip="{Binding Metadata.Description, Mode=OneWay}">
+													<Run Text="{Binding Metadata.Name, Mode=OneWay}" />
+												</TextBlock>
+											</DataTemplate>
+										</GridViewColumn.CellTemplate>
+									</GridViewColumn>
+
+									<GridViewColumn Header="Author" Width="100">
+										<GridViewColumn.CellTemplate>
+											<DataTemplate>
+												<TextBlock ToolTip="{Binding Metadata.Website}">
+													<Hyperlink Style="{StaticResource PrettyHyperlink}" NavigateUri="{Binding Metadata.Website}" RequestNavigate="Hyperlink_RequestNavigate">
+														<Run Text="{Binding Metadata.Author, Mode=OneWay}" />
+													</Hyperlink>
+												</TextBlock>
+											</DataTemplate>
+										</GridViewColumn.CellTemplate>
+									</GridViewColumn>
+
+									<GridViewColumn DisplayMemberBinding="{Binding Metadata.Version}" Header="Version" Width="50" />
+								</GridView.Columns>
+							</GridView>
+						</ListView.View>
+					</ListView>
+				</Border>
+			</TabItem>
+
+			<TabItem Style="{StaticResource RGBTabItem}" Header="About LogiRGB">
 				<Grid>
-					<Grid.RowDefinitions>
-						<RowDefinition Height="128" />
-						<RowDefinition Height="42" />
-						<RowDefinition Height="32"/>
-						<RowDefinition />
-					</Grid.RowDefinitions>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="140" />
+						<ColumnDefinition />
+					</Grid.ColumnDefinitions>
 
-					<Image Grid.Row="0" Source="/LogiRGB;component/Images/logirgb5_small.png" />
+					<StackPanel>
+						<StackPanel.Resources>
+							<Style TargetType="TextBlock">
+								<Setter Property="Foreground" Value="White" />
+								<Setter Property="HorizontalAlignment" Value="Center" />
+							</Style>
+						</StackPanel.Resources>
+						<Image Source="/LogiRGB;component/Images/logirgb5_small.png" />
+						<Separator />
+						<TextBlock>
+							<Run Text="Version "/>
+							<Run Text="{Binding CurrentVersion, Mode=OneWay}"/>
+						</TextBlock>
+					</StackPanel>
 
-					<Label Grid.Row="1" Content="LogiRGB" FontSize="30" FontWeight="Medium"
-						HorizontalContentAlignment="Center"  Padding="0" Foreground="White" />
+					<ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="42" />
+								<RowDefinition Height="32"/>
+								<RowDefinition />
+							</Grid.RowDefinitions>
 
-					<TextBlock Grid.Row="2" Foreground="White" Margin="40,0" FontSize="13" HorizontalAlignment="Center">
-						<Run>Made by</Run>
-						<Hyperlink Foreground="{StaticResource BlueBrush}" NavigateUri="https://peterwunder.de">Peter Wunder</Hyperlink>
-						<Run>in 2016</Run>
-					</TextBlock>
+							<Label Grid.Row="0" Content="LogiRGB" Foreground="White" FontSize="30" FontWeight="Medium" HorizontalContentAlignment="Center" Padding="0" />
+
+							<TextBlock Grid.Row="1" Foreground="White" Margin="6,0" FontSize="12" HorizontalAlignment="Center">
+								<Run>Made by</Run>
+								<Hyperlink Foreground="{StaticResource BlueBrush}" NavigateUri="https://peterwunder.de">Peter Wunder</Hyperlink>
+								<Run>in 2016</Run>
+							</TextBlock>
+						</Grid>
+					</ScrollViewer>
 				</Grid>
-			</ScrollViewer>
-		</TabItem>
-	</TabControl>
+			</TabItem>
+		</TabControl>
+
+		<Grid Grid.Row="1">
+			<Grid.RowDefinitions>
+				<RowDefinition />
+				<RowDefinition />
+			</Grid.RowDefinitions>
+
+			<Button Grid.Row="0" Style="{StaticResource RGBButton}" Height="32" Margin="10,5" Click="Debug_Click" Content="Reset Colors" Visibility="Hidden" />
+			<Button Grid.Row="1" Style="{StaticResource RGBButton}" Height="32" Margin="10,5" Click="Exit_Click" Content="Exit LogiRGB" />
+		</Grid>
+		
+	</Grid>
 </Window>
