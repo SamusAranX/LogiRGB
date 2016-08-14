@@ -114,9 +114,9 @@ namespace LogiRGB {
 		//}
 
 		private void FocusWatcher_FocusChanged(object sender, FocusChangedEventArgs e) {
-			using (FileStream fs = File.OpenRead(e.Filename))
-			using (SHA1 sha1 = SHA1.Create()) {
-				var checksum = sha1.ComputeHash(fs);
+			using (FileStream fs = new FileStream(e.Filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 8 * 1024))
+			using (var md5 = new MD5CryptoServiceProvider()) {
+				var checksum = md5.ComputeHash(fs);
 				var strChecksum = BitConverter.ToString(checksum).Replace("-", string.Empty).ToLowerInvariant();
 				this.ActiveColorHash = strChecksum;
 				this.ActiveAppName = e.Filename;
@@ -130,9 +130,9 @@ namespace LogiRGB {
 					//var color = Helpers.ByteArrayToColor(colorBytes);
 					var colorInfo = settings.HashesAndColors[strChecksum];
 					var color = Helpers.ByteArrayToColor(colorInfo.UsesCustomColor ? colorInfo.CustomColor : colorInfo.Color);
-					
+
 					Debug.WriteLine("Dictionary hit! " + color.ToString());
-					
+
 					colorManager.SetColor(color);
 				} else {
 					//

@@ -79,6 +79,10 @@ namespace LogiRGB {
 
 		public Visibility CustomColorVisibility {
 			get {
+				// This can happen right after starting LogiRGB
+				if (this.ActiveColorHash == null)
+					return Visibility.Hidden;
+
 				return this.Settings.HashesAndColors[this.ActiveColorHash].UsesCustomColor ? Visibility.Visible : Visibility.Hidden;
 			}
 		}
