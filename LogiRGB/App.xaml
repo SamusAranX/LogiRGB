@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			 xmlns:tb="http://www.hardcodet.net/taskbar"
              xmlns:local="clr-namespace:LogiRGB"
-			 ShutdownMode="OnExplicitShutdown"
+			 ShutdownMode="OnExplicitShutdown" LoadCompleted="Application_LoadCompleted"
 			 Startup="Application_Startup" Exit="Application_Exit">
 
 	<Application.Resources>
@@ -14,7 +14,7 @@
 			<local:ShowWindowCommand x:Key="showWindowCommand" />
 
 			<ContextMenu x:Key="contextMenu">
-				<MenuItem Click="Settings_Click" Header="Plugin Settings" />
+				<MenuItem Click="Settings_Click" Header="Open Settings" FontWeight="Bold" />
 				<Separator />
 				<MenuItem Click="About_Click" Header="About LogiRGB" />
 				<MenuItem Click="Exit_Click" Header="Exit" />
@@ -26,22 +26,30 @@
 			<Color x:Key="Red">#FF6000</Color>
 			<Color x:Key="Green">#00FF42</Color>
 			<Color x:Key="Blue">#0080FF</Color>
+				   
+			<Color x:Key="RedDarker">#BF4800</Color>
+			<Color x:Key="GreenDarker">#00BF31</Color>
+			<Color x:Key="BlueDarker">#0060BF</Color>
+				   
+			<Color x:Key="RedLighter">#FF8840</Color>
+			<Color x:Key="GreenLighter">#40FF71</Color>
+			<Color x:Key="BlueLighter">#40A0FF</Color>
 
-			<Color x:Key="Red75">#C0FF6000</Color>
-			<Color x:Key="Green75">#C000FF42</Color>
-			<Color x:Key="Blue75">#C00080FF</Color>
+			<SolidColorBrush x:Key="RedBrush" Color="#FF6000" />
+			<SolidColorBrush x:Key="GreenBrush" Color="#00FF42" />
+			<SolidColorBrush x:Key="BlueBrush" Color="#0080FF" />
+
+			<SolidColorBrush x:Key="RedDarkerBrush" Color="#BF4800" />
+			<SolidColorBrush x:Key="GreenDarkerBrush" Color="#00BF31" />
+			<SolidColorBrush x:Key="BlueDarkerBrush" Color="#0060BF" />
+
+			<SolidColorBrush x:Key="RedLighterBrush" Color="#FF8840" />
+			<SolidColorBrush x:Key="GreenLighterBrush" Color="#40FF71" />
+			<SolidColorBrush x:Key="BlueLighterBrush" Color="#40A0FF" />
 
 			<Color x:Key="RedTransparent">#00FF6000</Color>
 			<Color x:Key="GreenTransparent">#0000FF42</Color>
 			<Color x:Key="BlueTransparent">#000080FF</Color>
-
-			<SolidColorBrush x:Key="RedBrush" Color="{StaticResource Red}" />
-			<SolidColorBrush x:Key="GreenBrush" Color="{StaticResource Green}" />
-			<SolidColorBrush x:Key="BlueBrush" Color="{StaticResource Blue}" />
-
-			<SolidColorBrush x:Key="Red75Brush" Color="{StaticResource Red75}" />
-			<SolidColorBrush x:Key="Green75Brush" Color="{StaticResource Green75}" />
-			<SolidColorBrush x:Key="Blue75Brush" Color="{StaticResource Blue75}" />
 
 			<DropShadowEffect x:Key="DropShadow" ShadowDepth="1" BlurRadius="4" Direction="270" RenderingBias="Quality"/>
 			<SkewTransform x:Key="OWSkew" AngleX="-15" />
@@ -58,6 +66,7 @@
 				<GradientStop Offset="1" Color="#00FFFFFF"/>
 			</LinearGradientBrush>
 
+			<!-- just testing stuff -->
 			<!--<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="Styles/AdobeSlider.xaml" />
 			</ResourceDictionary.MergedDictionaries>-->

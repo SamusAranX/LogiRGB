@@ -4,16 +4,15 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LogiRGB"
-		xmlns:conv="clr-namespace:LogiRGB.Converters"
 		UseLayoutRounding="True" SourceInitialized="Window_SourceInitialized"
         mc:Ignorable="d" Loaded="Window_Loaded" Closing="Window_Closing" Topmost="True"
         Title="LogiRGB Settings" Icon="../Images/LogiRGB.ico" Typography.ContextualLigatures="True"
 		Height="250" Width="512" ResizeMode="CanMinimize" Background="{StaticResource HatchBrush}">
 	<Window.Resources>
-		<CubicEase x:Key="TranslateEase" EasingMode="EaseOut" />
+		<CubicEase x:Key="TranslateEase" EasingMode="EaseOut"  />
 
 		<LinearGradientBrush x:Key="BlueGradient" MappingMode="Absolute" StartPoint="0,0" EndPoint="4,0" ColorInterpolationMode="ScRgbLinearInterpolation">
-			<GradientStop Offset="0" Color="{StaticResource Blue}" />
+			<GradientStop Offset="0" Color="{StaticResource BlueTransparent}" />
 			<GradientStop Offset="1" Color="{StaticResource BlueTransparent}" />
 		</LinearGradientBrush>
 
@@ -23,6 +22,10 @@
 		</ControlTemplate>
 
 		<Style x:Key="RGBButton" TargetType="Button">
+			<Style.Resources>
+				<Duration x:Key="ScaleAnimationDuration">0:0:0.12</Duration>
+				<Duration x:Key="SlideAnimationDuration">0:0:0.33</Duration>
+			</Style.Resources>
 			<Setter Property="Background" Value="Transparent" />
 			<Setter Property="BorderBrush" Value="Transparent" />
 			<Setter Property="Foreground" Value="White" />
@@ -42,7 +45,6 @@
 
 								<Grid x:Name="RGB_Slider">
 									<Grid.RenderTransform>
-										<!-- -49, +49  -->
 										<TranslateTransform x:Name="RGB_Slider_Translate" X="-49" />
 									</Grid.RenderTransform>
 									<Grid.ColumnDefinitions>
@@ -69,11 +71,11 @@
 										<Storyboard>
 											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
 											  Storyboard.TargetProperty="Width" To="122"
-											  Storyboard.TargetName="RGB_Red_Bar" Duration="0:0:0.33" />
+											  Storyboard.TargetName="RGB_Red_Bar" Duration="{StaticResource SlideAnimationDuration}" />
 
 											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
 											  Storyboard.TargetProperty="(TranslateTransform.X)" To="49" 
-											  Storyboard.TargetName="RGB_Slider_Translate" Duration="0:0:0.33" />
+											  Storyboard.TargetName="RGB_Slider_Translate" Duration="{StaticResource SlideAnimationDuration}" />
 										</Storyboard>
 									</BeginStoryboard>
 								</Trigger.EnterActions>
@@ -82,11 +84,11 @@
 										<Storyboard>
 											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
 											  Storyboard.TargetProperty="Width" To="0"
-											  Storyboard.TargetName="RGB_Red_Bar" Duration="0:0:0.33" />
+											  Storyboard.TargetName="RGB_Red_Bar" Duration="{StaticResource SlideAnimationDuration}" />
 
 											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
 											  Storyboard.TargetProperty="(TranslateTransform.X)" To="-49" 
-											  Storyboard.TargetName="RGB_Slider_Translate" Duration="0:0:0.33" />
+											  Storyboard.TargetName="RGB_Slider_Translate" Duration="{StaticResource SlideAnimationDuration}" />
 										</Storyboard>
 									</BeginStoryboard>
 								</Trigger.ExitActions>
@@ -102,10 +104,10 @@
 										<Storyboard>
 											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
 											  Storyboard.TargetProperty="(ScaleTransform.ScaleX)" To="0.95" 
-											  Storyboard.TargetName="RGB_Button_Scale" Duration="0:0:0.16" />
+											  Storyboard.TargetName="RGB_Button_Scale" Duration="{StaticResource ScaleAnimationDuration}" />
 											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
 											  Storyboard.TargetProperty="(ScaleTransform.ScaleY)" To="0.95" 
-											  Storyboard.TargetName="RGB_Button_Scale" Duration="0:0:0.16" />
+											  Storyboard.TargetName="RGB_Button_Scale" Duration="{StaticResource ScaleAnimationDuration}" />
 										</Storyboard>
 									</BeginStoryboard>
 								</Trigger.EnterActions>
@@ -114,10 +116,10 @@
 										<Storyboard>
 											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
 											  Storyboard.TargetProperty="(ScaleTransform.ScaleX)" To="1" 
-											  Storyboard.TargetName="RGB_Button_Scale" Duration="0:0:0.16" />
+											  Storyboard.TargetName="RGB_Button_Scale" Duration="{StaticResource ScaleAnimationDuration}" />
 											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
 											  Storyboard.TargetProperty="(ScaleTransform.ScaleY)" To="1" 
-											  Storyboard.TargetName="RGB_Button_Scale" Duration="0:0:0.16" />
+											  Storyboard.TargetName="RGB_Button_Scale" Duration="{StaticResource ScaleAnimationDuration}" />
 										</Storyboard>
 									</BeginStoryboard>
 								</Trigger.ExitActions>
@@ -129,32 +131,95 @@
 		</Style>
 
 		<Style x:Key="RoundedButton" TargetType="Button">
+			<Style.Resources>
+				<Duration x:Key="AnimationDuration">0:0:0.12</Duration>
+			</Style.Resources>
 			<Setter Property="Foreground" Value="White" />
 			<Setter Property="FontSize" Value="14" />
+			<Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
 
 			<Setter Property="Template">
 				<Setter.Value>
 					<ControlTemplate TargetType="{x:Type Button}">
-						<Grid>
-							<Border x:Name="Button_BG"
+						<Grid RenderTransformOrigin="{TemplateBinding RenderTransformOrigin}">
+							<Grid.Resources>
+								<DropShadowEffect x:Key="GlowEffect" x:Name="RB_GlowEffect" 
+								Color="White" RenderingBias="Quality" ShadowDepth="0" BlurRadius="0" Opacity="0" />
+							</Grid.Resources>
+							<Grid.RenderTransform>
+								<ScaleTransform x:Name="RB_Scale" />
+							</Grid.RenderTransform>
+							<Border x:Name="RB_BG" Effect="{StaticResource GlowEffect}"
 								Background="#55000000" BorderBrush="White"
 								BorderThickness="1" CornerRadius="5"
 								Padding="4,2" MinWidth="50">
-								<ContentPresenter x:Name="MyContentPresenter" Effect="{StaticResource DropShadow}" Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+								<ContentPresenter x:Name="MyContentPresenter" Effect="{StaticResource DropShadow}" 
+									Content="{TemplateBinding Content}" 
+									HorizontalAlignment="Center" VerticalAlignment="Center" />
 							</Border>
 						</Grid>
 
 						<ControlTemplate.Triggers>
 							<Trigger Property="IsMouseOver" Value="True">
-								<Setter Property="Background" TargetName="Button_BG" Value="#44000000" />
+								<!--<Setter Property="Background" TargetName="RB_BG" Value="#44000000" />-->
+
+								<Trigger.EnterActions>
+									<BeginStoryboard>
+										<Storyboard>
+											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+												Storyboard.TargetProperty="(DropShadowEffect.Opacity)" To="0.6" 
+												Storyboard.TargetName="RB_GlowEffect" Duration="{StaticResource AnimationDuration}" />
+											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+												Storyboard.TargetProperty="(DropShadowEffect.BlurRadius)" To="6" 
+												Storyboard.TargetName="RB_GlowEffect" Duration="{StaticResource AnimationDuration}" />
+										</Storyboard>
+									</BeginStoryboard>
+								</Trigger.EnterActions>
+								<Trigger.ExitActions>
+									<BeginStoryboard>
+										<Storyboard>
+											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+												  Storyboard.TargetProperty="(DropShadowEffect.Opacity)" To="0" 
+												  Storyboard.TargetName="RB_GlowEffect" Duration="{StaticResource AnimationDuration}" />
+											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+												Storyboard.TargetProperty="(DropShadowEffect.BlurRadius)" To="0" 
+												Storyboard.TargetName="RB_GlowEffect" Duration="{StaticResource AnimationDuration}" />
+										</Storyboard>
+									</BeginStoryboard>
+								</Trigger.ExitActions>
 							</Trigger>
 
-							<Trigger Property="IsMouseOver" Value="False">
-								<Setter Property="Background" TargetName="Button_BG" Value="#55000000" />
+							<Trigger Property="IsEnabled" Value="False">
+								<Setter Property="Opacity" Value="0.5" />
 							</Trigger>
 
 							<Trigger Property="IsPressed" Value="True">
-								<Setter Property="Background" TargetName="Button_BG" Value="#66000000" />
+								<!--<Setter Property="Background" TargetName="RB_BG" Value="#66000000" />-->
+
+								<Trigger.EnterActions>
+									<BeginStoryboard>
+										<Storyboard>
+											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+												Storyboard.TargetProperty="(ScaleTransform.ScaleX)" To="0.96" 
+												Storyboard.TargetName="RB_Scale" Duration="{StaticResource AnimationDuration}" />
+											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+												Storyboard.TargetProperty="(ScaleTransform.ScaleY)" To="0.96" 
+												Storyboard.TargetName="RB_Scale" Duration="{StaticResource AnimationDuration}" />
+										</Storyboard>
+									</BeginStoryboard>
+								</Trigger.EnterActions>
+								<Trigger.ExitActions>
+									<BeginStoryboard>
+										<Storyboard>
+											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+												  Storyboard.TargetProperty="(ScaleTransform.ScaleX)" To="1" 
+												  Storyboard.TargetName="RB_Scale" Duration="{StaticResource AnimationDuration}" />
+											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+												  Storyboard.TargetProperty="(ScaleTransform.ScaleY)" To="1" 
+												  Storyboard.TargetName="RB_Scale" Duration="{StaticResource AnimationDuration}" />
+										</Storyboard>
+									</BeginStoryboard>
+								</Trigger.ExitActions>
 							</Trigger>
 						</ControlTemplate.Triggers>
 					</ControlTemplate>
@@ -163,11 +228,48 @@
 		</Style>
 
 		<Style x:Key="RGBTabItem" TargetType="TabItem">
+			<Style.Resources>
+				<Duration x:Key="SlideAnimationDuration">0:0:0.33</Duration>
+			</Style.Resources>
 			<Setter Property="Padding" Value="0" />
 			<Setter Property="Template">
 				<Setter.Value>
 					<ControlTemplate TargetType="TabItem">
 						<Grid Name="TabHeaderContainer" Height="32" Width="140" ClipToBounds="True">
+							<!--<VisualStateManager.VisualStateGroups>
+								<VisualStateGroup Name="CommonStates">
+									<VisualStateGroup.Transitions>
+										<VisualTransition GeneratedDuration="{StaticResource SlideAnimationDuration}" GeneratedEasingFunction="{StaticResource TranslateEase}" />
+									</VisualStateGroup.Transitions>
+
+									<VisualState Name="Normal" />
+
+									<VisualState Name="MouseOver">
+										<Storyboard>
+											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+											  Storyboard.TargetProperty="(Grid.RenderTransform).(TranslateTransform.X)" 
+											  By="-10" Storyboard.TargetName="TabHeaderBG" Duration="{StaticResource SlideAnimationDuration}" />
+										</Storyboard>
+									</VisualState>
+
+									<VisualState Name="Disabled">
+
+									</VisualState>
+								</VisualStateGroup>
+
+								<VisualStateGroup Name="SelectionStates">
+									<VisualStateGroup.Transitions>
+										<VisualTransition GeneratedDuration="{StaticResource SlideAnimationDuration}" GeneratedEasingFunction="{StaticResource TranslateEase}" />
+									</VisualStateGroup.Transitions>
+
+									<VisualState Name="Unselected" />
+
+									<VisualState Name="Selected">
+
+									</VisualState>
+								</VisualStateGroup>
+							</VisualStateManager.VisualStateGroups>-->
+
 							<Grid Name="TabHeaderBG">
 								<Grid.RenderTransform>
 									<TranslateTransform X="114" />
@@ -179,28 +281,41 @@
 									<ColumnDefinition />
 								</Grid.ColumnDefinitions>
 
-								<Border Grid.Column="3" Background="{StaticResource BlueBrush}" RenderTransform="{StaticResource OWSkew}" />
+								<Border Name="RGBTabItemStripeR" Grid.Column="1" Background="{StaticResource RedBrush}" RenderTransform="{StaticResource OWSkew}" />
+								<Border Name="RGBTabItemStripeG" Grid.Column="2" Background="{StaticResource GreenBrush}" RenderTransform="{StaticResource OWSkew}" />
+								<Border Name="RGBTabItemStripeB" Grid.Column="3" Background="{StaticResource BlueBrush}" RenderTransform="{StaticResource OWSkew}" />
 
-								<Border Grid.Column="1" Background="{StaticResource RedBrush}" RenderTransform="{StaticResource OWSkew}" />
-								<Border Grid.Column="2" Background="{StaticResource GreenBrush}" RenderTransform="{StaticResource OWSkew}" />
-								<Border Grid.Column="3" Grid.ColumnSpan="3" Background="{StaticResource BlueBrush}" />
+								<!-- Necessary gap filler -->
+								<Border Name="RGBTabItemStripeB2" Grid.Column="3" Grid.ColumnSpan="3" Background="{StaticResource BlueBrush}"  />
+
 							</Grid>
 
-							<Label Content="{TemplateBinding Header}" Effect="{StaticResource DropShadow}" 
+							<Label Content="{TemplateBinding Header}" Effect="{StaticResource DropShadow}" Name="RGBTabItemHeader"
 							VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center"
 							FontSize="16" FontStyle="Italic" Foreground="White" Margin="4,0" />
 
 							<ContentPresenter x:Name="ContentSite" ContentSource="Header" Visibility="Hidden"
 								VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
 						</Grid>
+
+						<!-- Template triggers -->
 						<ControlTemplate.Triggers>
+							<Trigger Property="IsEnabled" Value="False">
+								<Setter TargetName="RGBTabItemHeader" Property="Opacity" Value="0.5" />
+
+								<Setter TargetName="RGBTabItemStripeR" Property="Background" Value="#000000" />
+								<Setter TargetName="RGBTabItemStripeG" Property="Background" Value="#424242" />
+								<Setter TargetName="RGBTabItemStripeB" Property="Background" Value="#FFFFFF" />
+								<Setter TargetName="RGBTabItemStripeB2" Property="Background" Value="#FFFFFF" />
+							</Trigger>
+
 							<Trigger Property="IsSelected" Value="True">
 								<Trigger.EnterActions>
 									<BeginStoryboard>
 										<Storyboard>
 											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
 											  Storyboard.TargetProperty="(Grid.RenderTransform).(TranslateTransform.X)" 
-											  To="0" Storyboard.TargetName="TabHeaderBG" Duration="0:0:0.33" />
+											  To="0" Storyboard.TargetName="TabHeaderBG" Duration="{StaticResource SlideAnimationDuration}" />
 										</Storyboard>
 									</BeginStoryboard>
 								</Trigger.EnterActions>
@@ -209,7 +324,28 @@
 										<Storyboard>
 											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
 											  Storyboard.TargetProperty="(Grid.RenderTransform).(TranslateTransform.X)" 
-											  To="114" Storyboard.TargetName="TabHeaderBG" Duration="0:0:0.33" />
+											  To="114" Storyboard.TargetName="TabHeaderBG" Duration="{StaticResource SlideAnimationDuration}" />
+										</Storyboard>
+									</BeginStoryboard>
+								</Trigger.ExitActions>
+							</Trigger>
+
+							<Trigger Property="IsMouseOver" Value="True">
+								<Trigger.EnterActions>
+									<BeginStoryboard>
+										<Storyboard>
+											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+											  Storyboard.TargetProperty="(Grid.RenderTransform).(TranslateTransform.X)" 
+											  To="104" Storyboard.TargetName="TabHeaderBG" Duration="{StaticResource SlideAnimationDuration}" />
+										</Storyboard>
+									</BeginStoryboard>
+								</Trigger.EnterActions>
+								<Trigger.ExitActions>
+									<BeginStoryboard>
+										<Storyboard>
+											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+											  Storyboard.TargetProperty="(Grid.RenderTransform).(TranslateTransform.X)" 
+											  To="114" Storyboard.TargetName="TabHeaderBG" Duration="{StaticResource SlideAnimationDuration}" />
 										</Storyboard>
 									</BeginStoryboard>
 								</Trigger.ExitActions>
@@ -248,32 +384,18 @@
 			</Style.Triggers>
 		</Style>
 
-		<Style x:Key="PrettyHyperlink" TargetType="Hyperlink">
-			<Setter Property="Foreground" Value="{StaticResource BlueBrush}"/>
+		<Style TargetType="Hyperlink">
+			<Setter Property="Foreground" Value="{StaticResource BlueLighterBrush}"/>
 			<Setter Property="TextDecorations" Value="Underline"/>
 			<Style.Triggers>
 				<Trigger Property="IsMouseOver" Value="True">
-					<Setter Property="Foreground" Value="{StaticResource Blue75Brush}"/>
+					<Setter Property="Foreground" Value="{StaticResource BlueBrush}"/>
 				</Trigger>
-				<DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListViewItem}}" Value="True">
-					<Setter Property="Foreground" Value="White" />
-				</DataTrigger>
-
-				<DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListViewItem}}" Value="True">
-					<Setter Property="Foreground" Value="White" />
-				</DataTrigger>
-				<MultiDataTrigger>
-					<MultiDataTrigger.Conditions>
-						<Condition Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListViewItem}}" Value="True" />
-						<Condition Binding="{Binding Path=(Selector.IsSelectionActive), RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListViewItem}}" Value="False" />
-					</MultiDataTrigger.Conditions>
-					<Setter Property="Foreground" Value="{StaticResource BlueBrush}" />
-				</MultiDataTrigger>
 				<EventTrigger RoutedEvent="Hyperlink.MouseDown">
 					<BeginStoryboard>
 						<Storyboard>
 							<ColorAnimationUsingKeyFrames Duration="0" Storyboard.TargetProperty="Foreground.Color">
-								<DiscreteColorKeyFrame KeyTime="0" Value="Red" />
+								<DiscreteColorKeyFrame KeyTime="0" Value="{StaticResource BlueDarker}" />
 							</ColorAnimationUsingKeyFrames>
 						</Storyboard>
 					</BeginStoryboard>
@@ -293,6 +415,10 @@
 		</Grid.RowDefinitions>
 
 		<TabControl Grid.ColumnSpan="2" Grid.RowSpan="2" x:Name="SettingsTabs" TabStripPlacement="Left" Background="Transparent" BorderBrush="{StaticResource BlueGradient}" BorderThickness="4,0,0,0">
+			<TabItem Style="{StaticResource RGBTabItem}" Header="General">
+
+			</TabItem>
+
 			<TabItem Style="{StaticResource RGBTabItem}" Header="Color Preview" IsSelected="True">
 				<Border Grid.Row="1" Margin="4" CornerRadius="4" x:Name="colorBorder">
 					<Grid>
@@ -324,96 +450,38 @@
 				</Border>
 			</TabItem>
 
-			<TabItem Style="{StaticResource RGBTabItem}" Header="Plugins">
-				<Border Margin="4" CornerRadius="4" ClipToBounds="True">
-					<ListView x:Name="lvPlugins" Grid.Row="3" Margin="-4,-2,-4,0" ItemsSource="{Binding Plugins}" 
-					ItemContainerStyle="{StaticResource ModernListViewItem}" Foreground="Black">
-						<ListView.Resources>
-							<Style TargetType="TextBlock">
-								<Setter Property="TextTrimming" Value="CharacterEllipsis" />
-								<Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=Text }" />
-							</Style>
-						</ListView.Resources>
-						<ListView.View>
-							<GridView ColumnHeaderContainerStyle="{StaticResource ModernGridViewHeader}">
-								<GridView.Columns>
-									<GridViewColumn Width="32">
-										<GridViewColumn.CellTemplate>
-											<DataTemplate>
-												<!-- WPF won't let me use a property as a converter parameter. It's garbage like that. -->
-												<CheckBox Tag="{Binding Metadata.GUID}" 
-													IsChecked="{Binding Metadata, Mode=OneWay, Converter={conv:SettingsPluginGUIDIsSelectedConverter}}" 
-													Checked="PluginCheckBox_Toggled" Unchecked="PluginCheckBox_Toggled" HorizontalAlignment="Center" />
-											</DataTemplate>
-										</GridViewColumn.CellTemplate>
-									</GridViewColumn>
-
-									<GridViewColumn Header="Name" Width="154">
-										<GridViewColumn.CellTemplate>
-											<DataTemplate>
-												<TextBlock ToolTip="{Binding Metadata.Description, Mode=OneWay}">
-													<Run Text="{Binding Metadata.Name, Mode=OneWay}" />
-												</TextBlock>
-											</DataTemplate>
-										</GridViewColumn.CellTemplate>
-									</GridViewColumn>
-
-									<GridViewColumn Header="Author" Width="100">
-										<GridViewColumn.CellTemplate>
-											<DataTemplate>
-												<TextBlock ToolTip="{Binding Metadata.Website}">
-													<Hyperlink Style="{StaticResource PrettyHyperlink}" NavigateUri="{Binding Metadata.Website}" RequestNavigate="Hyperlink_RequestNavigate">
-														<Run Text="{Binding Metadata.Author, Mode=OneWay}" />
-													</Hyperlink>
-												</TextBlock>
-											</DataTemplate>
-										</GridViewColumn.CellTemplate>
-									</GridViewColumn>
-
-									<GridViewColumn DisplayMemberBinding="{Binding Metadata.Version}" Header="Version" Width="50" />
-								</GridView.Columns>
-							</GridView>
-						</ListView.View>
-					</ListView>
-				</Border>
-			</TabItem>
-
 			<TabItem Style="{StaticResource RGBTabItem}" Header="About LogiRGB">
-				<Grid>
+				<Grid Margin="4">
 					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="140" />
+						<ColumnDefinition Width="128" />
 						<ColumnDefinition />
 					</Grid.ColumnDefinitions>
+					<Grid.Resources>
+						<Style TargetType="TextBlock">
+							<Setter Property="Foreground" Value="White" />
+							<Setter Property="HorizontalAlignment" Value="Center" />
+						</Style>
+					</Grid.Resources>
 
 					<StackPanel>
-						<StackPanel.Resources>
-							<Style TargetType="TextBlock">
-								<Setter Property="Foreground" Value="White" />
-								<Setter Property="HorizontalAlignment" Value="Center" />
-							</Style>
-						</StackPanel.Resources>
 						<Image Source="/LogiRGB;component/Images/logirgb5_small.png" />
-						<Separator />
-						<TextBlock>
-							<Run Text="Version "/>
-							<Run Text="{Binding CurrentVersion, Mode=OneWay}"/>
-						</TextBlock>
+						<TextBlock Text="{Binding CurrentVersion, Mode=OneWay, StringFormat=Version {0}, FallbackValue=Version X}" />
+						<Button Style="{StaticResource RoundedButton}" FontSize="12" Height="24" Margin="10,5" Click="UpdateCheck_Click" Content="Check for updates" IsEnabled="False" />
 					</StackPanel>
 
-					<ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+					<ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
 						<Grid>
 							<Grid.RowDefinitions>
 								<RowDefinition Height="42" />
-								<RowDefinition Height="32"/>
 								<RowDefinition />
 							</Grid.RowDefinitions>
 
-							<Label Grid.Row="0" Content="LogiRGB" Foreground="White" FontSize="30" FontWeight="Medium" HorizontalContentAlignment="Center" Padding="0" />
+							<TextBlock Grid.Row="0" Text="LogiRGB" FontSize="30" FontWeight="Medium" HorizontalAlignment="Center" />
 
-							<TextBlock Grid.Row="1" Foreground="White" Margin="6,0" FontSize="12" HorizontalAlignment="Center">
+							<TextBlock Grid.Row="1" Margin="6,0" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Top">
 								<Run>Made by</Run>
-								<Hyperlink Foreground="{StaticResource BlueBrush}" NavigateUri="https://peterwunder.de">Peter Wunder</Hyperlink>
-								<Run>in 2016</Run>
+								<Hyperlink NavigateUri="https://peterwunder.de" RequestNavigate="Hyperlink_RequestNavigate">Peter Wunder</Hyperlink>
+								<Run>in 2016/2017.</Run>
 							</TextBlock>
 						</Grid>
 					</ScrollViewer>

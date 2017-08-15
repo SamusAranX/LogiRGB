@@ -9,11 +9,12 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>LogiRGB</RootNamespace>
     <AssemblyName>LogiRGB</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -38,13 +39,10 @@
   </PropertyGroup>
   <PropertyGroup />
   <PropertyGroup>
-    <ApplicationIcon>
-    </ApplicationIcon>
+    <ApplicationIcon>Images\LogiRGB.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup />
-  <PropertyGroup>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-  </PropertyGroup>
+  <PropertyGroup />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x64\Debug\</OutputPath>
@@ -65,17 +63,20 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>LogiRGB.App</StartupObject>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Hardcodet.Wpf.TaskbarNotification, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Hardcodet.NotifyIcon.Wpf.1.0.8\lib\net451\Hardcodet.Wpf.TaskbarNotification.dll</HintPath>
-      <Private>True</Private>
     </Reference>
-    <Reference Include="nQuant.Core">
-      <HintPath>..\..\..\..\Downloads\nQuant-1.0.3\net40\nQuant.Core.dll</HintPath>
+    <Reference Include="nQuant.Core, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\nQuant.1.0.3\lib\net40\nQuant.Core.dll</HintPath>
     </Reference>
     <Reference Include="PresentationFramework.Aero2" />
     <Reference Include="System" />
@@ -109,12 +110,8 @@
     <Compile Include="IconExtractor\IconExtractor.cs" />
     <Compile Include="IconExtractor\IconUtil.cs" />
     <Compile Include="IconExtractor\NativeMethods.cs" />
-    <Compile Include="Managers\PluginManager.cs" />
-    <Compile Include="Settings.cs" />
+    <Compile Include="Managers\Settings.cs" />
     <Compile Include="Managers\UpdateManager.cs" />
-    <Compile Include="Value Converters\BaseConverter.cs" />
-    <Compile Include="Value Converters\SettingsPluginGUIDIsSelectedConverter.cs" />
-    <Compile Include="Value Converters\SettingsPluginNameDescDisplayConverter.cs" />
     <Compile Include="WinAPI.cs" />
     <Page Include="Styles\ModernGridViewHeaderTemplate.xaml">
       <SubType>Designer</SubType>
@@ -162,7 +159,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="app.manifest" />
+    <None Include="app.manifest">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

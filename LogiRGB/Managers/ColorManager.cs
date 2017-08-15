@@ -33,95 +33,17 @@ namespace LogiRGB.Managers {
 			_currentColor = fallback;
 		}
 
-		private IEnumerable<Lazy<IPlugin, IPluginMetadata>> GetActivePlugins() {
-			var activePluginGUIDs = ((App)App.Current).settings.ActivePluginGUIDs.Select(g => new Guid(g));
-			string.Join(", ", activePluginGUIDs.Select(g => g.ToString()));
-
-			return ((App)App.Current).pluginManager.Plugins
-				.Where(p => activePluginGUIDs.Contains(new Guid(p.Metadata.GUID)));
-		}
-
-		private void ErrorHandler(Lazy<IPlugin, IPluginMetadata> lazyPlugin, Exception ex) {
-			try {
-				Debug.WriteLine($"Plugin \"{lazyPlugin.Metadata.Name}\" couldn't be loaded. (Exception)");
-				Debug.WriteLine($"Exception Details: {ex.Message}");
-
-				((App)App.Current).settings.ActivePluginGUIDs.Remove(lazyPlugin.Metadata.GUID);
-
-				MessageBox.Show($"Plugin \"{lazyPlugin.Metadata.Name}\" has crashed. " +
-					"It has been disabled to prevent more crashes.\n" +
-					"The following info might help the developer fix the crash:\n" +
-					$"{ex.Message}\n{ex.StackTrace}", "LogiRGB: Plugin crashed", MessageBoxButton.OK, MessageBoxImage.Error);
-			} catch (Exception) {
-				Debug.WriteLine("The error handler has crashed. All hope is lost.");
-				throw;
-			}
-		}
-
 		public void InitializePlugins() {
-			var plugins = GetActivePlugins();
-			Debug.WriteLine(plugins.Count());
-
-			foreach (var lazyPlugin in plugins) {
-				if (lazyPlugin.IsValueCreated) {
-					Debug.WriteLine($"Plugin \"{lazyPlugin.Metadata.Name}\" is already initialized. Skipping.");
-					continue;
-				}
-
-				var plugin = lazyPlugin.Value;
-				try {
-					if (!plugin.Initialize()) {
-						Debug.WriteLine($"Plugin \"{lazyPlugin.Metadata.Name}\" couldn't be loaded. (Initialize)");
-					}
-				} catch (Exception ex) {
-					ErrorHandler(lazyPlugin, ex);
-
-					//Debug.WriteLine($"Plugin \"{lazyPlugin.Metadata.Name}\" couldn't be loaded. (Exception)");
-					//Debug.WriteLine($"Exception Details: {ex.Message}");
-
-					//((App)App.Current).settings.ActivePluginGUIDs.Remove(lazyPlugin.Metadata.GUID);
-
-					//MessageBox.Show($"Plugin \"{lazyPlugin.Metadata.Name}\" has crashed. " + 
-					//	"It has been disabled to prevent more crashes.\n" + 
-					//	"The following info might help the developer fix the crash:\n" + 
-					//	$"{ex.Message}\n{ex.StackTrace}", "LogiRGB: Plugin crashed", MessageBoxButton.OK, MessageBoxImage.Error);
-				}
-			}
+			//TODO: Move LogiSDK logic to this method
 		}
 
 		public void Shutdown() {
-			var plugins = GetActivePlugins();
-
-			foreach (var lazyPlugin in plugins) {
-				if (!lazyPlugin.IsValueCreated)
-					continue;
-
-				var plugin = lazyPlugin.Value;
-				try {
-					plugin.Shutdown();
-				} catch (Exception ex) {
-					ErrorHandler(lazyPlugin, ex);
-					//Debug.WriteLine($"Plugin \"{lazyPlugin.Metadata.Name}\" couldn't be shut down. (Exception)");
-					//throw;
-				}
-			}
+			//TODO: Move LogiSDK logic to this method
 		}
 
 		public bool SetColor(DColor newColor) {
-			var plugins = GetActivePlugins();
+			//TODO: Move LogiSDK logic to this method
 
-			foreach (var lazyPlugin in plugins) {
-				var plugin = lazyPlugin.Value;
-				try {
-					if (!plugin.SetColor(newColor)) {
-						Debug.WriteLine($"Plugin \"{lazyPlugin.Metadata.Name}\" failed when setting color. (SetColor)");
-					}
-				} catch (Exception ex) {
-					ErrorHandler(lazyPlugin, ex);
-					//Debug.WriteLine($"Plugin \"{lazyPlugin.Metadata.Name}\" failed when setting color. (Exception)");
-					//throw;
-				}
-			}
 
 			_currentColor = newColor;
 
@@ -149,7 +71,7 @@ namespace LogiRGB.Managers {
 				quantizedBitmap.Save(debugPath);
 			}
 #endif
-
+			
 			int pixelSize = 4;
 			Dictionary<int, int> colorDict = new Dictionary<int, int>(); // Dictionary to sort colors with
 

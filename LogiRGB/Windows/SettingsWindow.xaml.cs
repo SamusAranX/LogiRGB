@@ -65,10 +65,6 @@ namespace LogiRGB {
 			}
 		}
 
-		public IEnumerable<Lazy<IPlugin, IPluginMetadata>> Plugins {
-			get { return ((App)App.Current).pluginManager.Plugins; }
-		}
-
 		private Settings Settings {
 			get { return ((App)App.Current).settings; }
 		}
@@ -99,7 +95,7 @@ namespace LogiRGB {
 		//
 
 		private void Window_Loaded(object sender, RoutedEventArgs e) {
-			Debug.WriteLine("Loaded!");
+			Debug.WriteLine("SettingsWindow: Loaded!");
 
 			this.DataContext = this;
 
@@ -118,7 +114,7 @@ namespace LogiRGB {
 
 		private void Debug_Click(object sender, RoutedEventArgs e) {
 			((App)App.Current).settings.HashesAndColors.Clear();
-			Debug.WriteLine("Hashes and colors reset");
+			Debug.WriteLine("SettingsWindow: Hashes and colors reset");
 		}
 
 		private void Exit_Click(object sender, RoutedEventArgs e) {
@@ -144,14 +140,14 @@ namespace LogiRGB {
 
 		private void colorLabel_KeyDown(object sender, KeyEventArgs e) {
 			if (e.Key == Key.Enter) {
-				Debug.WriteLine("Clearing focus");
+				Debug.WriteLine("SettingsWindow: Clearing focus");
 
 				Keyboard.ClearFocus();
 				
 				var hexString = ((TextBox)sender).Text;
 				Debug.WriteLine(hexString);
 				if (HEX_COLOR_REGEX.IsMatch(hexString)) {
-					Debug.WriteLine("Regex match");
+					Debug.WriteLine("SettingsWindow: Regex match");
 					try {
 						var newColor = ((MColor)MColorConverter.ConvertFromString(hexString)).ToDrawingColor();
 						Debug.WriteLine(newColor);
@@ -169,7 +165,7 @@ namespace LogiRGB {
 				}
 
 				// Entered text is not a valid hex color, reset everything
-				Debug.WriteLine("Invalid hex number, restoring old color");
+				Debug.WriteLine("SettingsWindow: Invalid hex number, restoring old color");
 				colorLabel.Text = ((App)App.Current).colorManager.CurrentColor.ToHexString();
 			}
 		}
@@ -181,33 +177,11 @@ namespace LogiRGB {
 		}
 
 		//
-		// Plugin list
+		// About window
 		//
-
-		private void PluginCheckBox_Toggled(object sender, RoutedEventArgs e) {
-			var checkBox = (CheckBox)e.Source;
-			var metadata = Plugins.SingleOrDefault(p => p.Metadata.GUID == (string)checkBox.Tag).Metadata;
-
-			Debug.WriteLine(Settings.ActivePluginGUIDs);
-			
-			if (checkBox.IsChecked.Value) {
-				if (!Settings.ActivePluginGUIDs.Contains(metadata.GUID)) {
-					Settings.ActivePluginGUIDs.Add(metadata.GUID);
-				} else
-					Debug.WriteLine("Plugin GUID list already contains new GUID");
-			} else {
-				Settings.ActivePluginGUIDs.Remove(metadata.GUID);
-				var lazyPlugin = Plugins.SingleOrDefault(p => p.Metadata.GUID == (string)checkBox.Tag);
-				if (lazyPlugin.IsValueCreated) {
-					lazyPlugin.Value.Shutdown();
-				} else {
-					Debug.WriteLine($"{metadata.Name} unload attempted even though plugin has not been loaded");
-				}
-			}
-
-			Debug.WriteLine(Settings.ActivePluginGUIDs);
-
-			Settings.SaveSettings();
+		
+		private void UpdateCheck_Click(object sender, RoutedEventArgs e) {
+			//TODO: Actually implement updates
 		}
 
 		//

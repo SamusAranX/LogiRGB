@@ -13,6 +13,7 @@ using System.Resources;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -31,7 +32,6 @@ namespace LogiRGB {
 
 		public ColorManager colorManager;
 		public FocusWatcher focusWatcher;
-		public PluginManager pluginManager;
 
 		private TaskbarIcon taskbarIcon;
 		public Settings settings;
@@ -40,14 +40,11 @@ namespace LogiRGB {
 		public string ActiveAppName { get; set; }
 
 		private void Application_Startup(object sender, StartupEventArgs e) {
-			Debug.WriteLine($"Own PID: {Process.GetCurrentProcess().Id}");
+			Debug.WriteLine($"App: Own PID: {Process.GetCurrentProcess().Id}");
 
 			taskbarIcon = (TaskbarIcon)FindResource("taskbarIcon");
 
-			pluginManager = new PluginManager();
-
 			settings = Settings.LoadSettings();
-			Debug.WriteLine(string.Join(", ", settings.ActivePluginGUIDs));
 
 			colorManager = new ColorManager(Helpers.ByteArrayToColor(settings.FallbackColor));
 			colorManager.InitializePlugins();
@@ -56,31 +53,10 @@ namespace LogiRGB {
 			focusWatcher = new FocusWatcher();
 			focusWatcher.FocusChanged += FocusWatcher_FocusChanged;
 			focusWatcher.StartWatching();
+		}
 
-			var containsInvalidGUIDs = settings.ActivePluginGUIDs.Select(ap => Tuple.Create(ap, pluginManager.Plugins.Select(p => p.Metadata.GUID).Contains(ap)));
-			if (pluginManager.Plugins.Count() == 0) {
-				// Checking if there are plugins loaded - if not, exit.
-				//taskbarIcon.ShowBalloonTip("LogiRGB", "No plugins found.\nExiting.", BalloonIcon.Warning);
-				var msg = "There are no valid plugins in the plugin folder.\n" +
-						  "Do you want to go to LogiRGB's plugin site?";
-				var result = MessageBox.Show(msg, "No plugins found", MessageBoxButton.YesNo, MessageBoxImage.Exclamation);
-				if (result == MessageBoxResult.Yes)
-					Process.Start(LogiRGB.Properties.Resources.PluginsURL);
-
-				App.Current.Shutdown();
-			} else if (containsInvalidGUIDs.All(x => x.Item2)) {
-				// With this fantastic LINQ query, we check whether there are GUIDs in ActivePluginGUIDs that are also not in the actual plugin list
-				// That way we know if there are any plugins that have been deleted between restarts of LogiRGB	
-				// False means that the plugin has been deleted.
-
-				// Get a list of GUIDs of plugins that still exist
-				var newActivePluginGUIDs = settings.ActivePluginGUIDs.Where(g => containsInvalidGUIDs.Single(t => t.Item1 == g).Item2);
-				settings.ActivePluginGUIDs = newActivePluginGUIDs.ToList();
-			}
-
-			if (settings.ActivePluginGUIDs.Count == 0) {
-				Debug.WriteLine("There are no plugins loaded.");
-			}
+		private void Application_LoadCompleted(object sender, System.Windows.Navigation.NavigationEventArgs e) {
+			Debug.WriteLine("App: Load completed");
 		}
 
 		public void OpenSettingsWindow(int tabIndex = 0) {
@@ -96,12 +72,12 @@ namespace LogiRGB {
 		}
 
 		private void Settings_Click(object sender, RoutedEventArgs e) {
-			Debug.WriteLine("Display Settings window");
-			OpenSettingsWindow(1); // 2 = plugin settings
+			Debug.WriteLine("App: Display Settings window");
+			OpenSettingsWindow(1); // 1 = general settings
 		}
 
 		private void About_Click(object sender, RoutedEventArgs e) {
-			Debug.WriteLine("Display About window");
+			Debug.WriteLine("App: Display About window");
 			OpenSettingsWindow(2); // 2 = about
 		}
 
@@ -109,58 +85,55 @@ namespace LogiRGB {
 			Current.Shutdown();
 		}
 
-		//private void ColorManager_ColorChanged(object sender, ColorChangedEventArgs e) {
-		//	Debug.WriteLine("Color changed: " + e.NewColor.ToString());
-		//}
+		private async void FocusWatcher_FocusChanged(object sender, FocusChangedEventArgs e) {
+			await Task.Run(() => {
+				using (FileStream fs = new FileStream(e.Filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 16 * 1024 * 1024))
+				using (var md5 = new MD5CryptoServiceProvider()) {
+					var checksum = md5.ComputeHash(fs);
+					var strChecksum = BitConverter.ToString(checksum).Replace("-", string.Empty).ToLowerInvariant();
+					this.ActiveColorHash = strChecksum;
+					this.ActiveAppName = e.Filename;
 
-		private void FocusWatcher_FocusChanged(object sender, FocusChangedEventArgs e) {
-			using (FileStream fs = new FileStream(e.Filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 8 * 1024))
-			using (var md5 = new MD5CryptoServiceProvider()) {
-				var checksum = md5.ComputeHash(fs);
-				var strChecksum = BitConverter.ToString(checksum).Replace("-", string.Empty).ToLowerInvariant();
-				this.ActiveColorHash = strChecksum;
-				this.ActiveAppName = e.Filename;
+					lock (settings) {
+						if (settings.HashesAndColors.ContainsKey(strChecksum)) {
+							//
+							// Dictionary entry found, using data from that
+							//
 
-				if (settings.HashesAndColors.ContainsKey(strChecksum)) {
-					//
-					// Dictionary entry found, using data from that
-					//
+							var colorInfo = settings.HashesAndColors[strChecksum];
+							var color = Helpers.ByteArrayToColor(colorInfo.UsesCustomColor ? colorInfo.CustomColor : colorInfo.Color);
 
-					//var colorBytes = settings.HashesAndColors[strChecksum];
-					//var color = Helpers.ByteArrayToColor(colorBytes);
-					var colorInfo = settings.HashesAndColors[strChecksum];
-					var color = Helpers.ByteArrayToColor(colorInfo.UsesCustomColor ? colorInfo.CustomColor : colorInfo.Color);
+							Debug.WriteLine("App: Dictionary hit! " + color.ToString());
 
-					Debug.WriteLine("Dictionary hit! " + color.ToString());
+							colorManager.SetColor(color);
+						} else {
+							//
+							// No dictionary entry found, generating new color and creating entry
+							//
 
-					colorManager.SetColor(color);
-				} else {
-					//
-					// No dictionary entry found, generating new color and creating entry
-					//
+							var iconBitmap = Helpers.GetEXEIconBitmap(e.Filename);
 
-					var iconBitmap = Helpers.GetEXEIconBitmap(e.Filename);
+							if (iconBitmap.Size.Width > 128) {
+								iconBitmap = iconBitmap.Resize(new DSize(128, 128));
+								Debug.WriteLine("App: Icon is bigger than 128x128, resizing.");
+							}
 
-					if (iconBitmap.Size.Width > 128) {
-						iconBitmap = iconBitmap.Resize(new DSize(128, 128));
-						Debug.WriteLine("Icon is bigger than 128x128, resizing.");
+							var colors = ColorManager.AnalyzeImage(iconBitmap, 32);
+							DColor newColor;
+							if (colors.Length == 0) {
+								newColor = Helpers.ByteArrayToColor(settings.FallbackColor);
+							} else {
+								newColor = colors[0];
+							}
+
+							settings.HashesAndColors[strChecksum] = new Settings.ColorInfo(newColor);
+							colorManager.SetColor(newColor);
+
+							settings.SaveSettings(); // Save settings so our newly generated colors aren't lost
+						}
 					}
-
-					var colors = ColorManager.AnalyzeImage(iconBitmap, 32);
-					DColor newColor;
-					if (colors.Length == 0) {
-						newColor = Helpers.ByteArrayToColor(settings.FallbackColor);
-					} else {
-						newColor = colors[0];
-					}
-
-					//settings.HashesAndColors[strChecksum] = newColor.ToByteArray();
-					settings.HashesAndColors[strChecksum] = new Settings.ColorInfo(newColor);
-					colorManager.SetColor(newColor);
-
-					settings.SaveSettings(); // Save settings so our newly generated colors aren't lost
 				}
-			}
+			});
 		}
 
 		private void Application_Exit(object sender, ExitEventArgs e) {
@@ -175,13 +148,14 @@ namespace LogiRGB {
 
 	class ShowWindowCommand : ICommand {
 #pragma warning disable 0067
+		// This disables the warning that this EventHandler isn't being used
 		public event EventHandler CanExecuteChanged;
 #pragma warning restore 0067
 
 		public void Execute(object parameter) {
-			Debug.WriteLine("Double Click");
+			Debug.WriteLine("App: Double Click");
 
-			((App)App.Current).OpenSettingsWindow(0); // 0 = color preview
+			((App)App.Current).OpenSettingsWindow(1); // 1 = color preview
 		}
 
 		public bool CanExecute(object parameter) {
