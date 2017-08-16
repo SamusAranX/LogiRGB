@@ -9,7 +9,7 @@
         Title="LogiRGB Settings" Icon="../Images/LogiRGB.ico" Typography.ContextualLigatures="True"
 		Height="250" Width="512" ResizeMode="CanMinimize" Background="{StaticResource HatchBrush}">
 	<Window.Resources>
-		<CubicEase x:Key="TranslateEase" EasingMode="EaseOut"  />
+		<CubicEase x:Key="TranslateEase" EasingMode="EaseOut" />
 
 		<LinearGradientBrush x:Key="BlueGradient" MappingMode="Absolute" StartPoint="0,0" EndPoint="4,0" ColorInterpolationMode="ScRgbLinearInterpolation">
 			<GradientStop Offset="0" Color="{StaticResource BlueTransparent}" />
@@ -236,6 +236,7 @@
 				<Setter.Value>
 					<ControlTemplate TargetType="TabItem">
 						<Grid Name="TabHeaderContainer" Height="32" Width="140" ClipToBounds="True">
+							<!-- VisualStateGroups are buggy bullshit and I refuse to use them until Microsoft fixes them -->
 							<!--<VisualStateManager.VisualStateGroups>
 								<VisualStateGroup Name="CommonStates">
 									<VisualStateGroup.Transitions>
@@ -248,7 +249,7 @@
 										<Storyboard>
 											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
 											  Storyboard.TargetProperty="(Grid.RenderTransform).(TranslateTransform.X)" 
-											  By="-10" Storyboard.TargetName="TabHeaderBG" Duration="{StaticResource SlideAnimationDuration}" />
+											  By="-10" Storyboard.TargetName="TabHeaderBG" />
 										</Storyboard>
 									</VisualState>
 
@@ -262,10 +263,20 @@
 										<VisualTransition GeneratedDuration="{StaticResource SlideAnimationDuration}" GeneratedEasingFunction="{StaticResource TranslateEase}" />
 									</VisualStateGroup.Transitions>
 
-									<VisualState Name="Unselected" />
+									<VisualState Name="Unselected">
+										<Storyboard>
+											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+											  Storyboard.TargetProperty="(Grid.RenderTransform).(TranslateTransform.X)" 
+											  To="114" Storyboard.TargetName="TabHeaderBG" />
+										</Storyboard>
+									</VisualState>
 
 									<VisualState Name="Selected">
-
+										<Storyboard>
+											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+											  Storyboard.TargetProperty="(Grid.RenderTransform).(TranslateTransform.X)" 
+											  To="0" Storyboard.TargetName="TabHeaderBG" />
+										</Storyboard>
 									</VisualState>
 								</VisualStateGroup>
 							</VisualStateManager.VisualStateGroups>-->
@@ -287,7 +298,6 @@
 
 								<!-- Necessary gap filler -->
 								<Border Name="RGBTabItemStripeB2" Grid.Column="3" Grid.ColumnSpan="3" Background="{StaticResource BlueBrush}"  />
-
 							</Grid>
 
 							<Label Content="{TemplateBinding Header}" Effect="{StaticResource DropShadow}" Name="RGBTabItemHeader"
