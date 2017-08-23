@@ -19,6 +19,8 @@ namespace LogiRGB {
 		public static extern bool UnhookWinEvent(IntPtr hWinEventHook);
 
 		public const uint WINEVENT_OUTOFCONTEXT = 0;
+		public const uint WINEVENT_SKIPOWNTHREAD = 1;
+		public const uint WINEVENT_SKIPOWNPROCESS = 2;
 		public const uint EVENT_SYSTEM_FOREGROUND = 3;
 
 		[DllImport("user32.dll")]
@@ -26,5 +28,22 @@ namespace LogiRGB {
 
 		[DllImport("user32.dll")]
 		public static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
+
+		// stuff for icon extraction
+
+		public const int GCL_HICONSM = -34;
+		public const int GCL_HICON = -14;
+
+		public const int ICON_SMALL = 0;
+		public const int ICON_BIG = 1;
+		public const int ICON_SMALL2 = 2;
+
+		public const int WM_GETICON = 0x7F;
+
+		[DllImport("user32.dll")]
+		public static extern IntPtr GetClassLongPtr(IntPtr hWnd, int nIndex);
+
+		[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = false)]
+		public static extern IntPtr SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
 	}
 }

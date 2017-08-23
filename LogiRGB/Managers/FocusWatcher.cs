@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
@@ -14,6 +15,12 @@ namespace LogiRGB.Managers {
 	/// </summary>
 	public class FocusWatcher {
 
+		public struct ProcessInfo {
+			public uint ProcessID;
+			public string ProcessName;
+
+		}
+
 		WinApi.WinEventDelegate dele = null;
 		IntPtr eventHook;
 
@@ -23,32 +30,35 @@ namespace LogiRGB.Managers {
 		uint[] forbiddenProcIDs = { 0, 4, 8 };
 
 		public FocusWatcher() {
-			dele = new WinApi.WinEventDelegate(WinEventProc);
+			this.dele = new WinApi.WinEventDelegate(WinEventProc);
 		}
 
 		public void StartWatching() {
-			eventHook = WinApi.SetWinEventHook(WinApi.EVENT_SYSTEM_FOREGROUND, WinApi.EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, dele, 0, 0, WinApi.WINEVENT_OUTOFCONTEXT);
+			this.eventHook = WinApi.SetWinEventHook(WinApi.EVENT_SYSTEM_FOREGROUND, WinApi.EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, this.dele, 0, 0, WinApi.WINEVENT_OUTOFCONTEXT | WinApi.WINEVENT_SKIPOWNPROCESS);
 		}
 
 		// Not really necessary because Windows automatically cleans up after us, but what the heck
 		public void StopWatching() {
-			WinApi.UnhookWinEvent(eventHook);
+			WinApi.UnhookWinEvent(this.eventHook);
 		}
 
 		public void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime) {
 			var windowHandle = WinApi.GetForegroundWindow();
 
-			uint processID;
-			WinApi.GetWindowThreadProcessId(windowHandle, out processID);
+			WinApi.GetWindowThreadProcessId(windowHandle, out uint processID);
 			Debug.WriteLine($"Process ID: {processID}");
 
-			if (forbiddenProcIDs.Contains(processID))
+			if (this.forbiddenProcIDs.Contains(processID))
 				return;
 
 			try {
-				string filename = Process.GetProcessById((int)processID).MainModule.FileName;
+				var process = Process.GetProcessById((int)processID).MainModule;
+				string filename = process.FileName;
 
 				OnFocusChanged((int)processID, windowHandle, filename);
+			} catch (Win32Exception ex) {
+				Debug.WriteLine($"FocusWatcher: {ex.Message}");
+				Debug.WriteLine($"FocusWatcher: Native Error Code: {ex.NativeErrorCode}");
 			} catch (Exception ex) {
 				Debug.WriteLine(ex.Message);
 			}
@@ -60,9 +70,6 @@ namespace LogiRGB.Managers {
 				return;
 
 			Debug.WriteLine($"FocusWatcher: {filename}");
-
-			if (filename == Assembly.GetExecutingAssembly().Location || filename.EndsWith("LogiRGB.vshost.exe"))
-				return; // Exclude LogiRGB
 
 			var eventArgs = new FocusChangedEventArgs(processID, windowHandle, filename);
 			handler(this, eventArgs);
@@ -77,26 +84,26 @@ namespace LogiRGB.Managers {
 		private readonly string _filename;
 
 		public FocusChangedEventArgs(int processID, IntPtr windowHandle, string filename) {
-			_processID = processID;
-			_windowHandle = windowHandle;
-			_filename = filename;
+			this._processID = processID;
+			this._windowHandle = windowHandle;
+			this._filename = filename;
 		}
 
 		public int ProcessID {
 			get {
-				return _processID;
+				return this._processID;
 			}
 		}
 
 		public IntPtr WindowHandle {
 			get {
-				return _windowHandle;
+				return this._windowHandle;
 			}
 		}
 
 		public string Filename {
 			get {
-				return _filename;
+				return this._filename;
 			}
 		}
 	}

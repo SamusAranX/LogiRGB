@@ -7,6 +7,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,12 +19,13 @@ using TsudaKageyu;
 using DColor = System.Drawing.Color;
 using DSize = System.Drawing.Size;
 using MColor = System.Windows.Media.Color;
+using Env = System.Environment;
 
 namespace LogiRGB {
 	public static class Helpers {
 
 		// Gets the biggest icon of an .exe file
-		public static Bitmap GetEXEIconBitmap(string path) {
+		public static Bitmap GetEXEIconBitmap(string path, IntPtr hwnd) {
 			IconExtractor ie = new IconExtractor(path);
 			if (ie.Count > 0) {
 				Icon bigIcon = IconUtil.Split(ie.GetIcon(0)).OrderByDescending(i => {
@@ -33,12 +35,34 @@ namespace LogiRGB {
 						return 1;
 					}
 				}).First();
-				
+
 				return IconUtil.ToBitmap(bigIcon);
 			} else {
-				Debug.WriteLine("ExtractAssociatedIcon");
-				return Icon.ExtractAssociatedIcon(path).ToBitmap();
+				Debug.WriteLine("Alternate Extraction Mode");
+
+				IntPtr iconHandle = WinApi.SendMessage(hwnd, WinApi.WM_GETICON, WinApi.ICON_BIG, 0);
+				if (iconHandle == IntPtr.Zero)
+					iconHandle = WinApi.SendMessage(hwnd, WinApi.WM_GETICON, WinApi.ICON_SMALL, 0);
+				if (iconHandle == IntPtr.Zero)
+					iconHandle = WinApi.SendMessage(hwnd, WinApi.WM_GETICON, WinApi.ICON_SMALL2, 0);
+				if (iconHandle == IntPtr.Zero)
+					iconHandle = WinApi.GetClassLongPtr(hwnd, WinApi.GCL_HICON);
+				if (iconHandle == IntPtr.Zero)
+					iconHandle = WinApi.GetClassLongPtr(hwnd, WinApi.GCL_HICONSM);
+
+				if (iconHandle == IntPtr.Zero)
+					return null;
+
+				Icon icn = Icon.FromHandle(iconHandle);
+
+				Debug.WriteLine(icn.Size);
+
+				return IconUtil.ToBitmap(icn);
 			}
+			//} else {
+			//	Debug.WriteLine("ExtractAssociatedIcon");
+			//	return Icon.ExtractAssociatedIcon(path).ToBitmap();
+			//}
 		}
 
 		public static DColor ByteArrayToColor(byte[] bytes) {
@@ -48,6 +72,72 @@ namespace LogiRGB {
 			} 
 
 			return DColor.FromArgb(bytes[0], bytes[1], bytes[2]);
+		}
+
+		/// <summary>
+		/// Looks for the most common (or dominant) colors in an image
+		/// </summary>
+		/// <param name="image">The image to be analyzed</param>
+		/// <param name="tolerance">Tolerance with which to check for monochrome colors.</param>
+		/// <returns>Returns a sorted array of the four most dominant colors</returns>
+		public static DColor[] AnalyzeImage(Bitmap image, int tolerance = 32, bool allowMonochrome = false) {
+			var wu = new nQuant.WuQuantizer();
+			var quantizedBitmap = new Bitmap(wu.QuantizeImage(image, 40, 70));
+			
+
+#if DEBUG
+			var unixTimestamp = (DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds.ToString();
+			var unixTimestampBytes = Encoding.UTF8.GetBytes(unixTimestamp);
+			using (var md5 = MD5.Create()) {
+				var debugPath = Path.Combine(Env.GetFolderPath(Env.SpecialFolder.MyPictures), "LogiRGB_Debug", BitConverter.ToString(md5.ComputeHash(unixTimestampBytes)) + ".png").Replace("-", string.Empty).ToLowerInvariant();
+				Directory.CreateDirectory(Path.GetDirectoryName(debugPath));
+				quantizedBitmap.Save(debugPath);
+			}
+#endif
+
+			int pixelSize = 4;
+			Dictionary<int, int> colorDict = new Dictionary<int, int>(); // Dictionary to sort colors with
+
+			var imgData = quantizedBitmap.LockBits(new Rectangle(System.Drawing.Point.Empty, quantizedBitmap.Size), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+			unsafe {
+				for (int y = 0; y < imgData.Height; y++) {
+					byte* row = (byte*)imgData.Scan0 + (y * imgData.Stride);
+
+					for (int x = 0; x < imgData.Width; x++) {
+						byte b = row[x * pixelSize];
+						byte g = row[x * pixelSize + 1];
+						byte r = row[x * pixelSize + 2];
+						byte a = row[x * pixelSize + 3];
+
+						// if alpha is greater than 200 and if not monochrome
+						if (a > 200 && (Math.Abs(r - g) + Math.Abs(g - b) + Math.Abs(b - r)) > tolerance) {
+							byte[] bytes = { b, g, r, a };
+							int bgra = BitConverter.ToInt32(bytes.ToArray(), 0);
+
+							if (colorDict.ContainsKey(bgra)) {
+								colorDict[bgra]++;
+							} else {
+								colorDict[bgra] = 0;
+								//Debug.WriteLine(Color.FromArgb(bgra));
+							}
+						}
+					}
+				}
+			}
+			quantizedBitmap.UnlockBits(imgData);
+
+			DColor[] fourColors = { };
+			if (colorDict.Count > 0) {
+				fourColors = colorDict.Where(c => c.Key != 0)
+							.OrderByDescending(c => c.Value)
+							.Select(c => DColor.FromArgb(c.Key))
+							//.Where(c => !c.isMonochrome(tolerance))
+							.Take(4).ToArray();
+			} else {
+				fourColors.Populate(DColor.FromArgb(0, 127, 255));
+			}
+
+			return fourColors;
 		}
 
 		/// <summary>

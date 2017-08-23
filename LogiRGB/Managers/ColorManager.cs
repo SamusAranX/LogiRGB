@@ -12,110 +12,69 @@ using System.Windows.Media.Imaging;
 using DColor = System.Drawing.Color;
 using DSize = System.Drawing.Size;
 using MColor = System.Windows.Media.Color;
-using Env = System.Environment;
 using System.Security.Cryptography;
-using PluginContracts;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using LogiRGB.Managers;
+using LogiRGB.Managers.Plugins;
+using LogiRGB.Managers.SDK_Wrappers;
 
 namespace LogiRGB.Managers {
 	public class ColorManager {
-
 		private DColor _currentColor;
 		public DColor CurrentColor {
 			get {
-				return _currentColor;
+				return this._currentColor;
+			}
+		}
+
+		private string _typeName;
+		private string TypeName {
+			get {
+				return this._typeName;
 			}
 		}
 
 		public ColorManager(DColor fallback) {
-			_currentColor = fallback;
+			this._currentColor = fallback;
+			this._typeName = this.GetType().Name;
 		}
 
-		public void InitializePlugins() {
-			//TODO: Move LogiSDK logic to this method
-		}
+		public bool Initialize() {
+			Debug.WriteLine(this.TypeName + ": Initialize");
 
-		public void Shutdown() {
-			//TODO: Move LogiSDK logic to this method
+			if (!LogitechGSDK.LogiLedInit())
+				return false; // Don't return the result of the following calls. If this one fails, get the heck outta here.
+
+			// Only target devices that support RGB lighting
+			LogitechGSDK.LogiLedSetTargetDevice(LogitechGSDK.LOGI_DEVICETYPE_RGB);
+			LogitechGSDK.LogiLedSaveCurrentLighting();
+
+			return true;
 		}
 
 		public bool SetColor(DColor newColor) {
 			//TODO: Move LogiSDK logic to this method
 
+			var col = newColor;
 
-			_currentColor = newColor;
+			var r = (int)Math.Min(col.R / 2.55, 100);
+			var g = (int)Math.Min(col.G / 2.55, 100);
+			var b = (int)Math.Min(col.B / 2.55, 100);
 
-			OnColorChanged(_currentColor);
+			Debug.WriteLine(this.TypeName + ": SetColor " + col.ToString());
 
-			return true;
+			this._currentColor = newColor;
+			OnColorChanged(this._currentColor);
+
+			return LogitechGSDK.LogiLedSetLighting(r, g, b);
 		}
 
-		/// <summary>
-		/// Looks for the most common (or dominant) colors in an image
-		/// </summary>
-		/// <param name="image">The image to be analyzed</param>
-		/// <param name="tolerance">Tolerance with which to check for monochrome colors.</param>
-		/// <returns>Returns a sorted array of the four most dominant colors</returns>
-		public static DColor[] AnalyzeImage(Bitmap image, int tolerance = 32, bool allowMonochrome = false) {
-			var wu = new nQuant.WuQuantizer();
-			var quantizedBitmap = new Bitmap(wu.QuantizeImage(image, 40, 70));
+		public void Shutdown() {
+			Debug.WriteLine(this.TypeName + ": Shutdown");
 
-#if DEBUG
-			var unixTimestamp = (DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds.ToString();
-			var unixTimestampBytes = Encoding.UTF8.GetBytes(unixTimestamp);
-			using(var md5 = MD5.Create()) {
-				var debugPath = Path.Combine(Env.GetFolderPath(Env.SpecialFolder.MyPictures), "LogiRGB_Debug", BitConverter.ToString(md5.ComputeHash(unixTimestampBytes)) + ".png").Replace("-", string.Empty).ToLowerInvariant();
-				Directory.CreateDirectory(Path.GetDirectoryName(debugPath));
-				quantizedBitmap.Save(debugPath);
-			}
-#endif
-			
-			int pixelSize = 4;
-			Dictionary<int, int> colorDict = new Dictionary<int, int>(); // Dictionary to sort colors with
-
-			var imgData = quantizedBitmap.LockBits(new Rectangle(System.Drawing.Point.Empty, quantizedBitmap.Size), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-			unsafe
-			{
-				for (int y = 0; y < imgData.Height; y++) {
-					byte* row = (byte*)imgData.Scan0 + (y * imgData.Stride);
-
-					for (int x = 0; x < imgData.Width; x++) {
-						byte b = row[x * pixelSize];
-						byte g = row[x * pixelSize + 1];
-						byte r = row[x * pixelSize + 2];
-						byte a = row[x * pixelSize + 3];
-
-						// if alpha is greater than 200 and if not monochrome
-						if (a > 200 && (Math.Abs(r - g) + Math.Abs(g - b) + Math.Abs(b - r)) > tolerance) {
-							byte[] bytes = { b, g, r, a };
-							int bgra = BitConverter.ToInt32(bytes.ToArray(), 0);
-
-							if (colorDict.ContainsKey(bgra)) {
-								colorDict[bgra]++;
-							} else {
-								colorDict[bgra] = 0;
-								//Debug.WriteLine(Color.FromArgb(bgra));
-							}
-						}
-					}
-				}
-			}
-			quantizedBitmap.UnlockBits(imgData);
-
-			DColor[] fourColors = { };
-			if (colorDict.Count > 0) {
-				fourColors = colorDict.Where(c => c.Key != 0)
-							.OrderByDescending(c => c.Value)
-							.Select(c => DColor.FromArgb(c.Key))
-							//.Where(c => !c.isMonochrome(tolerance))
-							.Take(4).ToArray();
-			} else {
-				fourColors.Populate(DColor.FromArgb(0, 127, 255));
-			}
-
-			return fourColors;
+			LogitechGSDK.LogiLedRestoreLighting();
+			LogitechGSDK.LogiLedShutdown();
 		}
 
 		protected virtual void OnColorChanged(DColor newColor) {
@@ -134,12 +93,12 @@ namespace LogiRGB.Managers {
 		private readonly DColor _newColor;
 
 		public ColorChangedEventArgs(DColor newColor) {
-			_newColor = newColor;
+			this._newColor = newColor;
 		}
 
 		public DColor NewColor {
 			get {
-				return _newColor;
+				return this._newColor;
 			}
 		}
 	}

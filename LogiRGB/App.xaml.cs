@@ -19,7 +19,6 @@ using System.Windows.Input;
 
 using Hardcodet.Wpf.TaskbarNotification;
 using LogiRGB.Managers;
-using PluginContracts;
 
 using DColor = System.Drawing.Color;
 using DSize = System.Drawing.Size;
@@ -42,17 +41,17 @@ namespace LogiRGB {
 		private void Application_Startup(object sender, StartupEventArgs e) {
 			Debug.WriteLine($"App: Own PID: {Process.GetCurrentProcess().Id}");
 
-			taskbarIcon = (TaskbarIcon)FindResource("taskbarIcon");
+			this.taskbarIcon = (TaskbarIcon)FindResource("taskbarIcon");
 
-			settings = Settings.LoadSettings();
+			this.settings = Settings.LoadSettings();
 
-			colorManager = new ColorManager(Helpers.ByteArrayToColor(settings.FallbackColor));
-			colorManager.InitializePlugins();
+			this.colorManager = new ColorManager(Helpers.ByteArrayToColor(this.settings.FallbackColor));
+			this.colorManager.Initialize();
 			//colorManager.ColorChanged += ColorManager_ColorChanged;
 
-			focusWatcher = new FocusWatcher();
-			focusWatcher.FocusChanged += FocusWatcher_FocusChanged;
-			focusWatcher.StartWatching();
+			this.focusWatcher = new FocusWatcher();
+			this.focusWatcher.FocusChanged += FocusWatcher_FocusChanged;
+			this.focusWatcher.StartWatching();
 		}
 
 		private void Application_LoadCompleted(object sender, System.Windows.Navigation.NavigationEventArgs e) {
@@ -73,7 +72,7 @@ namespace LogiRGB {
 
 		private void Settings_Click(object sender, RoutedEventArgs e) {
 			Debug.WriteLine("App: Display Settings window");
-			OpenSettingsWindow(1); // 1 = general settings
+			OpenSettingsWindow(0); // 0 = general settings
 		}
 
 		private void About_Click(object sender, RoutedEventArgs e) {
@@ -87,6 +86,9 @@ namespace LogiRGB {
 
 		private async void FocusWatcher_FocusChanged(object sender, FocusChangedEventArgs e) {
 			await Task.Run(() => {
+				var sw = new Stopwatch();
+				sw.Start();
+
 				using (FileStream fs = new FileStream(e.Filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 16 * 1024 * 1024))
 				using (var md5 = new MD5CryptoServiceProvider()) {
 					var checksum = md5.ComputeHash(fs);
@@ -94,55 +96,64 @@ namespace LogiRGB {
 					this.ActiveColorHash = strChecksum;
 					this.ActiveAppName = e.Filename;
 
-					lock (settings) {
-						if (settings.HashesAndColors.ContainsKey(strChecksum)) {
+					lock (this.settings) {
+						if (this.settings.HashesAndColors.ContainsKey(strChecksum)) {
 							//
 							// Dictionary entry found, using data from that
 							//
 
-							var colorInfo = settings.HashesAndColors[strChecksum];
+							var colorInfo = this.settings.HashesAndColors[strChecksum];
 							var color = Helpers.ByteArrayToColor(colorInfo.UsesCustomColor ? colorInfo.CustomColor : colorInfo.Color);
 
 							Debug.WriteLine("App: Dictionary hit! " + color.ToString());
 
-							colorManager.SetColor(color);
+							Application.Current.Dispatcher.Invoke(() => {
+								this.colorManager.SetColor(color);
+							});
 						} else {
 							//
 							// No dictionary entry found, generating new color and creating entry
 							//
 
-							var iconBitmap = Helpers.GetEXEIconBitmap(e.Filename);
+							var iconBitmap = Helpers.GetEXEIconBitmap(e.Filename, e.WindowHandle);
 
-							if (iconBitmap.Size.Width > 128) {
-								iconBitmap = iconBitmap.Resize(new DSize(128, 128));
-								Debug.WriteLine("App: Icon is bigger than 128x128, resizing.");
+							if (iconBitmap.Size.Width > 128 && iconBitmap.Size.Height > 128) {
+								//iconBitmap = iconBitmap.ResizeQuickly(new DSize(128, 128));
+								Debug.WriteLine("App: Icon is bigger than 128×128, resizing.");
 							}
 
-							var colors = ColorManager.AnalyzeImage(iconBitmap, 32);
+							var colors = Helpers.AnalyzeImage(iconBitmap, 32);
 							DColor newColor;
 							if (colors.Length == 0) {
-								newColor = Helpers.ByteArrayToColor(settings.FallbackColor);
+								newColor = Helpers.ByteArrayToColor(this.settings.FallbackColor);
 							} else {
-								newColor = colors[0];
+								// Make color more intense and save it that way
+								newColor = colors[0].MoreIntenseColor();
 							}
 
-							settings.HashesAndColors[strChecksum] = new Settings.ColorInfo(newColor);
-							colorManager.SetColor(newColor);
+							this.settings.HashesAndColors[strChecksum] = new Settings.ColorInfo(newColor);
 
-							settings.SaveSettings(); // Save settings so our newly generated colors aren't lost
+							Application.Current.Dispatcher.Invoke(() => {
+								this.colorManager.SetColor(newColor);
+							});
+
+							this.settings.SaveSettings(); // Save settings so our newly generated colors aren't lost
 						}
 					}
 				}
+
+				sw.Stop();
+				Debug.WriteLine($"FocusChanged took {sw.Elapsed.TotalSeconds.ToString("0.###")} seconds");
 			});
 		}
 
 		private void Application_Exit(object sender, ExitEventArgs e) {
-			settings.SaveSettings();
+			this.settings.SaveSettings();
 
-			colorManager.Shutdown();
+			this.colorManager.Shutdown();
 
-			focusWatcher.StopWatching();
-			focusWatcher.FocusChanged -= FocusWatcher_FocusChanged;
+			this.focusWatcher.StopWatching();
+			this.focusWatcher.FocusChanged -= FocusWatcher_FocusChanged;
 		}
 	}
 
@@ -155,7 +166,7 @@ namespace LogiRGB {
 		public void Execute(object parameter) {
 			Debug.WriteLine("App: Double Click");
 
-			((App)App.Current).OpenSettingsWindow(1); // 1 = color preview
+			((App)App.Current).OpenSettingsWindow(0); // 0 = general settings
 		}
 
 		public bool CanExecute(object parameter) {

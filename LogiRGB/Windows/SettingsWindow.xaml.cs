@@ -24,7 +24,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using LogiRGB.Managers;
 using Microsoft.Win32;
-using PluginContracts;
 
 using MColor = System.Windows.Media.Color;
 using MColorConverter = System.Windows.Media.ColorConverter;
@@ -44,7 +43,7 @@ namespace LogiRGB {
 		private const int GWL_STYLE = -16;
 		private const int WS_MAXIMIZEBOX = 0x10000;
 
-		// this is not a true const, but #hashtagyolo
+		// this is not a true const, but #hashtagYolo
 		private Regex HEX_COLOR_REGEX = new Regex("([0-9a-f]{6})", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
 		private void Window_SourceInitialized(object sender, EventArgs e) {
@@ -100,9 +99,9 @@ namespace LogiRGB {
 			this.DataContext = this;
 
 			var currentColor = ((App)App.Current).colorManager.CurrentColor;
-			colorBorder.Background = new SolidColorBrush(currentColor.ToMediaColor());
-			colorLabel.Text = currentColor.ToHexString();
-			exeNameLabel.Content = Path.GetFileName(((App)App.Current).ActiveAppName);
+			this.colorBorder.Background = new SolidColorBrush(currentColor.ToMediaColor());
+			this.colorLabel.Text = currentColor.ToHexString();
+			this.exeNameLabel.Content = Path.GetFileName(((App)App.Current).ActiveAppName);
 
 			((App)App.Current).colorManager.ColorChanged += ColorManager_ColorChanged;
 			((App)App.Current).focusWatcher.FocusChanged += FocusWatcher_FocusChanged;
@@ -122,7 +121,7 @@ namespace LogiRGB {
 		}
 
 		private void FocusWatcher_FocusChanged(object sender, FocusChangedEventArgs e) {
-			exeNameLabel.Content = Path.GetFileName(e.Filename);
+			this.exeNameLabel.Content = Path.GetFileName(e.Filename);
 		}
 
 		private void ColorManager_ColorChanged(object sender, ColorChangedEventArgs e) {
@@ -130,15 +129,15 @@ namespace LogiRGB {
 
 			OnPropertyChanged("CustomColorVisibility");
 
-			colorBorder.Background = new SolidColorBrush(e.NewColor.ToMediaColor());
-			colorLabel.Text = e.NewColor.ToHexString();
+			this.colorBorder.Background = new SolidColorBrush(e.NewColor.ToMediaColor());
+			this.colorLabel.Text = e.NewColor.ToHexString();
 		}
 
 		//
 		// Color preview
 		//
 
-		private void colorLabel_KeyDown(object sender, KeyEventArgs e) {
+		private void ColorLabel_KeyDown(object sender, KeyEventArgs e) {
 			if (e.Key == Key.Enter) {
 				Debug.WriteLine("SettingsWindow: Clearing focus");
 
@@ -146,7 +145,7 @@ namespace LogiRGB {
 				
 				var hexString = ((TextBox)sender).Text;
 				Debug.WriteLine(hexString);
-				if (HEX_COLOR_REGEX.IsMatch(hexString)) {
+				if (this.HEX_COLOR_REGEX.IsMatch(hexString)) {
 					Debug.WriteLine("SettingsWindow: Regex match");
 					try {
 						var newColor = ((MColor)MColorConverter.ConvertFromString(hexString)).ToDrawingColor();
@@ -166,7 +165,7 @@ namespace LogiRGB {
 
 				// Entered text is not a valid hex color, reset everything
 				Debug.WriteLine("SettingsWindow: Invalid hex number, restoring old color");
-				colorLabel.Text = ((App)App.Current).colorManager.CurrentColor.ToHexString();
+				this.colorLabel.Text = ((App)App.Current).colorManager.CurrentColor.ToHexString();
 			}
 		}
 
