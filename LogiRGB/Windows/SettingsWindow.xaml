@@ -9,8 +9,6 @@
         Title="LogiRGB Settings" Icon="../Images/LogiRGB.ico" Typography.ContextualLigatures="True"
 		Height="250" Width="512" ResizeMode="CanMinimize" Background="{StaticResource HatchBrush}">
 	<Window.Resources>
-		<CubicEase x:Key="TranslateEase" EasingMode="EaseOut" />
-
 		<LinearGradientBrush x:Key="BlueGradient" MappingMode="Absolute" StartPoint="0,0" EndPoint="4,0" ColorInterpolationMode="ScRgbLinearInterpolation">
 			<GradientStop Offset="0" Color="{StaticResource BlueTransparent}" />
 			<GradientStop Offset="1" Color="{StaticResource BlueTransparent}" />
@@ -25,6 +23,7 @@
 			<Style.Resources>
 				<Duration x:Key="ScaleAnimationDuration">0:0:0.12</Duration>
 				<Duration x:Key="SlideAnimationDuration">0:0:0.33</Duration>
+				<CubicEase x:Key="TranslateEase" EasingMode="EaseOut" />
 			</Style.Resources>
 			<Setter Property="Background" Value="Transparent" />
 			<Setter Property="BorderBrush" Value="Transparent" />
@@ -133,6 +132,7 @@
 		<Style x:Key="RoundedButton" TargetType="Button">
 			<Style.Resources>
 				<Duration x:Key="AnimationDuration">0:0:0.12</Duration>
+				<CubicEase x:Key="TranslateEase" EasingMode="EaseOut" />
 			</Style.Resources>
 			<Setter Property="Foreground" Value="White" />
 			<Setter Property="FontSize" Value="14" />
@@ -230,60 +230,19 @@
 		<Style x:Key="RGBTabItem" TargetType="TabItem">
 			<Style.Resources>
 				<Duration x:Key="SlideAnimationDuration">0:0:0.33</Duration>
+				<CubicEase x:Key="TranslateEase" EasingMode="EaseOut" />
 			</Style.Resources>
 			<Setter Property="Padding" Value="0" />
 			<Setter Property="Template">
 				<Setter.Value>
 					<ControlTemplate TargetType="TabItem">
 						<Grid Name="TabHeaderContainer" Height="32" Width="140" ClipToBounds="True">
-							<!-- VisualStateGroups are buggy bullshit and I refuse to use them until Microsoft fixes them -->
-							<!--<VisualStateManager.VisualStateGroups>
-								<VisualStateGroup Name="CommonStates">
-									<VisualStateGroup.Transitions>
-										<VisualTransition GeneratedDuration="{StaticResource SlideAnimationDuration}" GeneratedEasingFunction="{StaticResource TranslateEase}" />
-									</VisualStateGroup.Transitions>
-
-									<VisualState Name="Normal" />
-
-									<VisualState Name="MouseOver">
-										<Storyboard>
-											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
-											  Storyboard.TargetProperty="(Grid.RenderTransform).(TranslateTransform.X)" 
-											  By="-10" Storyboard.TargetName="TabHeaderBG" />
-										</Storyboard>
-									</VisualState>
-
-									<VisualState Name="Disabled">
-
-									</VisualState>
-								</VisualStateGroup>
-
-								<VisualStateGroup Name="SelectionStates">
-									<VisualStateGroup.Transitions>
-										<VisualTransition GeneratedDuration="{StaticResource SlideAnimationDuration}" GeneratedEasingFunction="{StaticResource TranslateEase}" />
-									</VisualStateGroup.Transitions>
-
-									<VisualState Name="Unselected">
-										<Storyboard>
-											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
-											  Storyboard.TargetProperty="(Grid.RenderTransform).(TranslateTransform.X)" 
-											  To="114" Storyboard.TargetName="TabHeaderBG" />
-										</Storyboard>
-									</VisualState>
-
-									<VisualState Name="Selected">
-										<Storyboard>
-											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
-											  Storyboard.TargetProperty="(Grid.RenderTransform).(TranslateTransform.X)" 
-											  To="0" Storyboard.TargetName="TabHeaderBG" />
-										</Storyboard>
-									</VisualState>
-								</VisualStateGroup>
-							</VisualStateManager.VisualStateGroups>-->
-
 							<Grid Name="TabHeaderBG">
 								<Grid.RenderTransform>
-									<TranslateTransform X="114" />
+									<TransformGroup>
+										<TranslateTransform x:Name="TabHeaderBGTLSelected" X="114" />
+										<TranslateTransform x:Name="TabHeaderBGTLMouseOver" X="0" />
+									</TransformGroup>
 								</Grid.RenderTransform>
 								<Grid.ColumnDefinitions>
 									<ColumnDefinition Width="10" />
@@ -323,6 +282,65 @@
 								<Trigger.EnterActions>
 									<BeginStoryboard>
 										<Storyboard>
+											<!--<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+											  Storyboard.TargetProperty="(Grid.RenderTransform).(TranslateTransform.X)" 
+											  To="0" Storyboard.TargetName="TabHeaderBG" Duration="{StaticResource SlideAnimationDuration}" />-->
+											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+											  Storyboard.TargetProperty="(TranslateTransform.X)" 
+											  To="0" Storyboard.TargetName="TabHeaderBGTLSelected" Duration="{StaticResource SlideAnimationDuration}" />
+										</Storyboard>
+									</BeginStoryboard>
+								</Trigger.EnterActions>
+								<Trigger.ExitActions>
+									<BeginStoryboard>
+										<Storyboard>
+											<!--<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+											  Storyboard.TargetProperty="(Grid.RenderTransform).(TranslateTransform.X)" 
+											  To="114" Storyboard.TargetName="TabHeaderBG" Duration="{StaticResource SlideAnimationDuration}" />-->
+											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+											  Storyboard.TargetProperty="(TranslateTransform.X)" 
+											  To="114" Storyboard.TargetName="TabHeaderBGTLSelected" Duration="{StaticResource SlideAnimationDuration}" />
+										</Storyboard>
+									</BeginStoryboard>
+								</Trigger.ExitActions>
+							</Trigger>
+
+							<MultiTrigger>
+								<MultiTrigger.Conditions>
+									<Condition Property="IsMouseOver" Value="True" />
+									<Condition Property="IsSelected" Value="False" />
+								</MultiTrigger.Conditions>
+
+								<MultiTrigger.EnterActions>
+									<BeginStoryboard>
+										<Storyboard>
+											<!--<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+											  Storyboard.TargetProperty="(Grid.Opacity)" 
+											  To="0.75" Storyboard.TargetName="TabHeaderBG" Duration="{StaticResource SlideAnimationDuration}" />-->
+											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+											  Storyboard.TargetProperty="(TranslateTransform.X)" 
+											  To="-14" Storyboard.TargetName="TabHeaderBGTLMouseOver" Duration="{StaticResource SlideAnimationDuration}" />
+										</Storyboard>
+									</BeginStoryboard>
+								</MultiTrigger.EnterActions>
+								<MultiTrigger.ExitActions>
+									<BeginStoryboard>
+										<Storyboard>
+											<!--<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+											  Storyboard.TargetProperty="(Grid.Opacity)" 
+											  To="1" Storyboard.TargetName="TabHeaderBG" Duration="{StaticResource SlideAnimationDuration}" />-->
+											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+											  Storyboard.TargetProperty="(TranslateTransform.X)" 
+											  To="0" Storyboard.TargetName="TabHeaderBGTLMouseOver" Duration="{StaticResource SlideAnimationDuration}" />
+										</Storyboard>
+									</BeginStoryboard>
+								</MultiTrigger.ExitActions>
+							</MultiTrigger>
+
+							<!--<Trigger Property="IsSelected" Value="True">
+								<Trigger.EnterActions>
+									<BeginStoryboard>
+										<Storyboard>
 											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
 											  Storyboard.TargetProperty="(Grid.RenderTransform).(TranslateTransform.X)" 
 											  To="0" Storyboard.TargetName="TabHeaderBG" Duration="{StaticResource SlideAnimationDuration}" />
@@ -340,7 +358,33 @@
 								</Trigger.ExitActions>
 							</Trigger>
 
-							<Trigger Property="IsMouseOver" Value="True">
+							<MultiTrigger>
+								<MultiTrigger.Conditions>
+									<Condition Property="IsMouseOver" Value="True" />
+									<Condition Property="IsSelected" Value="False" />
+								</MultiTrigger.Conditions>
+
+								<MultiTrigger.EnterActions>
+									<BeginStoryboard>
+										<Storyboard>
+											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+											  Storyboard.TargetProperty="(Grid.RenderTransform).(TranslateTransform.X)" 
+											  To="104" Storyboard.TargetName="TabHeaderBG" Duration="{StaticResource SlideAnimationDuration}" />
+										</Storyboard>
+									</BeginStoryboard>
+								</MultiTrigger.EnterActions>
+								<MultiTrigger.ExitActions>
+									<BeginStoryboard>
+										<Storyboard>
+											<DoubleAnimation EasingFunction="{StaticResource TranslateEase}"
+											  Storyboard.TargetProperty="(Grid.RenderTransform).(TranslateTransform.X)" 
+											  To="114" Storyboard.TargetName="TabHeaderBG" Duration="{StaticResource SlideAnimationDuration}" />
+										</Storyboard>
+									</BeginStoryboard>
+								</MultiTrigger.ExitActions>
+							</MultiTrigger>-->
+
+							<!--<Trigger Property="IsMouseOver" Value="True">
 								<Trigger.EnterActions>
 									<BeginStoryboard>
 										<Storyboard>
@@ -359,7 +403,7 @@
 										</Storyboard>
 									</BeginStoryboard>
 								</Trigger.ExitActions>
-							</Trigger>
+							</Trigger>-->
 						</ControlTemplate.Triggers>
 					</ControlTemplate>
 				</Setter.Value>
@@ -425,32 +469,35 @@
 		</Grid.RowDefinitions>
 
 		<TabControl Grid.ColumnSpan="2" Grid.RowSpan="2" x:Name="SettingsTabs" TabStripPlacement="Left" Background="Transparent" BorderBrush="{StaticResource BlueGradient}" BorderThickness="4,0,0,0">
-			<TabItem Style="{StaticResource RGBTabItem}" Header="General">
-
-			</TabItem>
+			<TabItem Style="{StaticResource RGBTabItem}" Header="General"/>
 
 			<TabItem Style="{StaticResource RGBTabItem}" Header="Color Preview" IsSelected="True">
 				<Border Grid.Row="1" Margin="4" CornerRadius="4" x:Name="colorBorder">
 					<Grid>
 						<Grid.RowDefinitions>
-							<RowDefinition Height="50" />
 							<RowDefinition  />
 							<RowDefinition Height="50" />
 						</Grid.RowDefinitions>
 
-						<StackPanel Grid.Row="1" VerticalAlignment="Center" Margin="20,0">
-							<TextBox Template="{StaticResource shitThatIsStillNecessaryBecauseTheWPFTeamIsABunchOfMorons}" 
-								x:Name="colorLabel" MaxLength="7"
-								Text="#FFFFFF"
-								Background="{Binding Background, ElementName=colorBorder}" Foreground="White"
+						<StackPanel Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="20,0">
+							<StackPanel Orientation="Horizontal">
+								<Label Content="#" Foreground="White"
+								Effect="{StaticResource DropShadow}"
+								FontSize="26" FontWeight="DemiBold" Padding="0" />
+
+								<TextBox Template="{StaticResource shitThatIsStillNecessaryBecauseTheWPFTeamIsABunchOfMorons}" 
+								x:Name="colorLabel" MaxLength="6" Text="FFFFFF"
+								Background="{Binding Background, ElementName=colorBorder}"
+								Foreground="White" CaretBrush="White"
 								BorderBrush="Transparent"
-								HorizontalAlignment="Center" Effect="{StaticResource DropShadow}" 
+								Effect="{StaticResource DropShadow}" 
 								FontSize="26" FontWeight="DemiBold" Padding="0"
 								IsReadOnly="False" 
-								KeyDown="colorLabel_KeyDown" />
-
+								KeyDown="ColorLabel_KeyDown" />
+							</StackPanel>
+							
 							<Border Background="#55000000" CornerRadius="5" Padding="4,2" HorizontalAlignment="Center">
-								<Label Content="example.exe" x:Name="exeNameLabel" Foreground="White" Effect="{StaticResource DropShadow}" FontSize="14" Padding="0" />
+								<Label Content="example.exe" x:Name="exeNameLabel" Foreground="White" Effect="{StaticResource DropShadow}" FontSize="14" Padding="0" HorizontalContentAlignment="Center" HorizontalAlignment="Center" />
 							</Border>
 						</StackPanel>
 
