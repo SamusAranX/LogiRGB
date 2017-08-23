@@ -120,7 +120,4 @@
   <data name="HomepageURL" xml:space="preserve">
     <value>https://apps.peterwunder.de/logirgb/</value>
   </data>
-  <data name="PluginsURL" xml:space="preserve">
-    <value>https://apps.peterwunder.de/logirgb/plugins</value>
-  </data>
 </root>

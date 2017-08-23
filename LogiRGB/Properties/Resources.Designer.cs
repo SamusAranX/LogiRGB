@@ -68,14 +68,5 @@ namespace LogiRGB.Properties {
                 return ResourceManager.GetString("HomepageURL", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to https://apps.peterwunder.de/logirgb/plugins.
-        /// </summary>
-        internal static string PluginsURL {
-            get {
-                return ResourceManager.GetString("PluginsURL", resourceCulture);
-            }
-        }
     }
 }
