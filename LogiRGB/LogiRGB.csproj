@@ -71,6 +71,26 @@
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Hardcodet.Wpf.TaskbarNotification, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Hardcodet.NotifyIcon.Wpf.1.0.8\lib\net451\Hardcodet.Wpf.TaskbarNotification.dll</HintPath>
@@ -110,6 +130,9 @@
     <Compile Include="IconExtractor\IconExtractor.cs" />
     <Compile Include="IconExtractor\IconUtil.cs" />
     <Compile Include="IconExtractor\NativeMethods.cs" />
+    <Compile Include="Managers\Plugins\LogitechPlugin.cs" />
+    <Compile Include="Managers\Plugins\PluginInterface.cs" />
+    <Compile Include="Managers\SDK Wrappers\LogitechGSDK.cs" />
     <Compile Include="Managers\Settings.cs" />
     <Compile Include="Managers\UpdateManager.cs" />
     <Compile Include="WinAPI.cs" />
@@ -173,18 +196,19 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PluginContracts\PluginContracts.csproj">
-      <Project>{e94d7e39-dc03-4068-b277-8adecb4feeea}</Project>
-      <Name>PluginContracts</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Images\LogiRGB.ico" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\logirgb5_small.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Managers\SDK Wrappers\LogitechLedEnginesWrapper_x64.dll" />
+    <Content Include="Managers\SDK Wrappers\LogitechLedEnginesWrapper_x86.dll" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>echo F|xcopy /d "$(ProjectDir)Managers\SDK Wrappers\LogitechLedEnginesWrapper_$(PlatformName).dll" "$(TargetDir)LogitechLedEnginesWrapper.dll"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
